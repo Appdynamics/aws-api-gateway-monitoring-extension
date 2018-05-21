@@ -13,32 +13,26 @@
  * limitations under the License.
  */
 
-package com.appdynamics.extensions.aws.apigateway.configuration;
+package com.appdynamics.extensions.aws.apigateway;
 
-import com.appdynamics.extensions.aws.config.Configuration;
+
+import com.amazonaws.services.cloudwatch.model.Metric;
+import com.google.common.base.Predicate;
 
 /**
- * Created by venkata.konala on 4/23/18.
+ * Created by venkata.konala on 5/21/18.
  */
-public class APIGatewayConfiguration extends Configuration {
+public class ApiNamePredicate implements Predicate<Metric> {
 
-    private Boolean enableAnalytics;
     private String apiName;
 
-
-    public void setEnableAnalytics(Boolean enableAnalytics) {
-        this.enableAnalytics = enableAnalytics;
+    public ApiNamePredicate(String ApiName){
+        this.apiName = ApiName;
     }
 
-    public Boolean getEnableAnalytics() {
-        return enableAnalytics;
-    }
-
-    public void setApiName(String apiName) {
-        this.apiName = apiName;
-    }
-
-    public String getApiName() {
-        return apiName;
+    @Override
+    public boolean apply(Metric metric) {
+        String APIName = metric.getDimensions().get(0).getValue();
+        return APIName.equalsIgnoreCase(apiName);
     }
 }

@@ -17,6 +17,7 @@ package com.appdynamics.extensions.aws.apigateway.processors;
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.model.DimensionFilter;
+import com.appdynamics.extensions.aws.apigateway.ApiNamePredicate;
 import com.appdynamics.extensions.aws.config.IncludeMetric;
 import com.appdynamics.extensions.aws.dto.AWSMetric;
 import com.appdynamics.extensions.aws.metric.NamespaceMetricStatistics;
@@ -27,10 +28,12 @@ import com.appdynamics.extensions.metrics.Metric;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
@@ -40,6 +43,7 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
 
     private static final Logger logger = Logger.getLogger(APIGatewayMetricsProcessor.class);
     private static final String NAMESPACE = "AWS/ApiGateway";
+    private static final String APINAME = "ApiName";
     private List<IncludeMetric> includeMetrics;
     private String apiName;
 
@@ -50,33 +54,29 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
 
     @Override
     public List<AWSMetric> getMetrics(AmazonCloudWatch awsCloudWatch, String accountName, LongAdder awsRequestsCounter) {
-
         List<DimensionFilter> dimensionFilters = getDimensionFilters();
-
-        return MetricsProcessorHelper.getFilteredMetrics();
+        ApiNamePredicate apiNamePredicate = new ApiNamePredicate(apiName);
+        return MetricsProcessorHelper.getFilteredMetrics(awsCloudWatch, awsRequestsCounter, NAMESPACE, includeMetrics, dimensionFilters, apiNamePredicate);
     }
 
     private List<DimensionFilter> getDimensionFilters(){
         List<DimensionFilter> dimensionFilters = Lists.newArrayList();
-
         DimensionFilter apiNameDimensionFilter = new DimensionFilter();
-        apiNameDimensionFilter.withName("ApiName");
-        if(!Strings.isNullOrEmpty(apiName)){
-            apiNameDimensionFilter.withName(apiName);
-        }
+        apiNameDimensionFilter.withName(APINAME);
         dimensionFilters.add(apiNameDimensionFilter);
-
         return dimensionFilters;
     }
 
     @Override
     public StatisticType getStatisticType(AWSMetric metric) {
-        return null;
+        return MetricsProcessorHelper.getStatisticType(metric.getIncludeMetric(), includeMetrics);
     }
 
     @Override
     public List<Metric> createMetricStatsMapForUpload(NamespaceMetricStatistics namespaceMetricStats) {
-        return null;
+        Map<String, String> dimensionToMetricPathNameDictionary = Maps.newHashMap();
+        dimensionToMetricPathNameDictionary.put(APINAME, "API Name");
+        return MetricsProcessorHelper.createMetricStatsMapForUpload(namespaceMetricStats, dimensionToMetricPathNameDictionary, false);
     }
 
     @Override

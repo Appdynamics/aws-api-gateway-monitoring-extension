@@ -26,6 +26,8 @@ accounts:
     displayAccountName: "AppD"
     regions: ["us-east-1"]
 
+apiName: ""
+
 
 metricsConfig:
     # Global time range configuration, applicable to all the metrics configured below.
@@ -47,17 +49,49 @@ metricsConfig:
     #       startTimeInMinsBeforeNow: 15
     #       endTimeInMinsBeforeNow: 0
     includeMetrics:
-        - name: ""
-          alias: ""
-          statType: ""
-          delta: ""
-          multiplier:
-          aggregationType: ""
-          timeRollUpType: ""
-          clusterRollUpType: ""
+        - name: "4XXError"
+          alias: "4XXError"
+          statType: "ave"
+          delta: false
+          multiplier: 1
+          aggregationType: "AVERAGE"
+          timeRollUpType: "AVERAGE"
+          clusterRollUpType: "INDIVIDUAL"
           metricsTimeRange:
               startTimeInMinsBeforeNow: 10
               endTimeInMinsBeforeNow: 0
+        - name: "5XXError"
+          alias: "5XXError"
+          statType: "ave"
+          delta: false
+          multiplier: 1
+          aggregationType: "AVERAGE"
+          timeRollUpType: "AVERAGE"
+          clusterRollUpType: "INDIVIDUAL"
+        - name: "CacheHitCount"
+          alias: "CacheHitCount"
+          statType: "ave"
+          delta: false
+          multiplier: 1
+          aggregationType: "AVERAGE"
+          timeRollUpType: "AVERAGE"
+          clusterRollUpType: "INDIVIDUAL"
+        - name: "CacheMissCount"
+          alias: "CacheMissCount"
+          statType: "ave"
+          delta: false
+          multiplier: 1
+          aggregationType: "AVERAGE"
+          timeRollUpType: "AVERAGE"
+          clusterRollUpType: "INDIVIDUAL"
+        - name: "Count"
+          alias: "API count"
+          statType: "ave"
+          delta: false
+          multiplier: 1
+          aggregationType: "AVERAGE"
+          timeRollUpType: "AVERAGE"
+          clusterRollUpType: "INDIVIDUAL"
 
 
 
