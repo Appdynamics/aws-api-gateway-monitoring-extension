@@ -42,7 +42,7 @@ public class APIGatewayMonitor extends SingleNamespaceCloudwatchMonitor<APIGatew
                 apiGatewayConfiguration.getConcurrencyConfig(),
                 apiGatewayConfiguration.getMetricsConfig(),
                 metricsProcessor,
-                getContextConfiguration().getMetricPrefix())
+                apiGatewayConfiguration.getMetricPrefix())
                 .withCredentialsDecryptionConfig(apiGatewayConfiguration.getCredentialsDecryptionConfig())
                 .withProxyConfig(apiGatewayConfiguration.getProxyConfig())
                 .build();

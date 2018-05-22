@@ -20,8 +20,7 @@ import com.amazonaws.services.cloudwatch.model.DimensionFilter;
 import com.appdynamics.extensions.aws.apigateway.ApiNamePredicate;
 import com.appdynamics.extensions.aws.config.IncludeMetric;
 import com.appdynamics.extensions.aws.dto.AWSMetric;
-import com.appdynamics.extensions.aws.metric.NamespaceMetricStatistics;
-import com.appdynamics.extensions.aws.metric.StatisticType;
+import com.appdynamics.extensions.aws.metric.*;
 import com.appdynamics.extensions.aws.metric.processors.MetricsProcessor;
 import com.appdynamics.extensions.aws.metric.processors.MetricsProcessorHelper;
 import com.appdynamics.extensions.metrics.Metric;
@@ -55,8 +54,9 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     @Override
     public List<AWSMetric> getMetrics(AmazonCloudWatch awsCloudWatch, String accountName, LongAdder awsRequestsCounter) {
         List<DimensionFilter> dimensionFilters = getDimensionFilters();
+        /*TODO Not required*/
         ApiNamePredicate apiNamePredicate = new ApiNamePredicate(apiName);
-        return MetricsProcessorHelper.getFilteredMetrics(awsCloudWatch, awsRequestsCounter, NAMESPACE, includeMetrics, dimensionFilters, apiNamePredicate);
+        return MetricsProcessorHelper.getFilteredMetrics(awsCloudWatch, awsRequestsCounter, NAMESPACE, includeMetrics, dimensionFilters);
     }
 
     private List<DimensionFilter> getDimensionFilters(){
@@ -74,9 +74,53 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
 
     @Override
     public List<Metric> createMetricStatsMapForUpload(NamespaceMetricStatistics namespaceMetricStats) {
-        Map<String, String> dimensionToMetricPathNameDictionary = Maps.newHashMap();
+        List<Metric> stats = Lists.newArrayList();
+        if(namespaceMetricStats != null){
+            for(AccountMetricStatistics accountMetricStatistics : namespaceMetricStats.getAccountMetricStatisticsList()){
+                for(RegionMetricStatistics regionMetricStatistics : accountMetricStatistics.getRegionMetricStatisticsList()){
+                    for (MetricStatistic metricStatistic : regionMetricStatistics.getMetricStatisticsList()){
+                        String metricPath = createMetricPath(accountMetricStatistics.getAccountName(), regionMetricStatistics.getRegion(), metricStatistic);
+                        if(metricStatistic.getValue() != null){
+                            Map<String, Object> metricProperties = Maps.newHashMap();
+                            AWSMetric awsMetric = metricStatistic.getMetric();
+                            IncludeMetric includeMetric = awsMetric.getIncludeMetric();
+                            metricProperties.put("alias", includeMetric.getAlias());
+                            metricProperties.put("multiplier", includeMetric.getMultiplier());
+                            metricProperties.put("aggregationType", includeMetric.getAggregationType());
+                            metricProperties.put("timeRollUpType", includeMetric.getTimeRollUpType());
+                            metricProperties.put("clusterRollUpType ", includeMetric.getClusterRollUpType());
+                            metricProperties.put("delta", includeMetric.isDelta());
+                            Metric metric = new Metric(includeMetric.getName(), Double.toString(metricStatistic.getValue()), metricStatistic.getMetricPrefix() + metricPath, metricProperties);
+                            stats.add(metric);
+                        }
+                        else{
+                            logger.debug(String.format("Ignoring metric [ %s ] which has null value", metricPath));
+                        }
+                    }
+                }
+            }
+        }
+        return stats;
+        /*Map<String, String> dimensionToMetricPathNameDictionary = Maps.newHashMap();
         dimensionToMetricPathNameDictionary.put(APINAME, "API Name");
-        return MetricsProcessorHelper.createMetricStatsMapForUpload(namespaceMetricStats, dimensionToMetricPathNameDictionary, false);
+        return MetricsProcessorHelper.createMetricStatsMapForUpload(namespaceMetricStats, dimensionToMetricPathNameDictionary, false);*/
+    }
+
+    private String createMetricPath(String accountName, String region, MetricStatistic metricStatistic){
+        AWSMetric awsMetric = metricStatistic.getMetric();
+        IncludeMetric includeMetric = awsMetric.getIncludeMetric();
+        com.amazonaws.services.cloudwatch.model.Metric metric = awsMetric.getMetric();
+        String apiName = metric.getDimensions().get(0).getValue();
+        StringBuilder stringBuilder = new StringBuilder(accountName)
+                .append("|")
+                .append(region)
+                .append("|")
+                .append("API")
+                .append("|")
+                .append(apiName)
+                .append(includeMetric.getName());
+        return stringBuilder.toString();
+
     }
 
     @Override
