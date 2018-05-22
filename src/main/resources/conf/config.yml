@@ -92,7 +92,22 @@ metricsConfig:
           aggregationType: "AVERAGE"
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-
+        - name: "IntegrationLatency"
+          alias: "Integration Latency"
+          statType: "ave"
+          delta: false
+          multiplier: 1
+          aggregationType: "AVERAGE"
+          timeRollUpType: "AVERAGE"
+          clusterRollUpType: "INDIVIDUAL"
+        - name: "Latency"
+          alias: "Latency"
+          statType: "ave"
+          delta: false
+          multiplier: 1
+          aggregationType: "AVERAGE"
+          timeRollUpType: "AVERAGE"
+          clusterRollUpType: "INDIVIDUAL"
 
 
 
