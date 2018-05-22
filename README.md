@@ -48,6 +48,19 @@ In order to use the extension, you need to update the config.yml file that is pr
        regions: ["eu-central-1","eu-west-1"]
    ~~~
 
+## Metrics
+
+   1. 4XXError            -        The number of client-side errors captured in a specified period.
+   2. 5XXError            -        The number of server-side errors captured in a given period.
+   3. CacheHitCount       -        The number of requests served from the API cache in a given period.
+   4. CacheMissCount      -        The number of requests served from the back end in a given period, when API caching is enabled.
+   5. Count               -        The total number API requests in a given period.
+   6. IntegrationLatency  -        The time between when API Gateway relays a request to the back end and when it receives a response from the back end.
+   7. Latency             -        The time between when API Gateway receives a request from a client and when it returns a response to the client. The latency includes the integration latency and other API Gateway overhead.
+
+   Apart from the above metric, we also have a metric called "API calls", that gives out the number of cloudwatch API calls from the extension.
+
+
 ## Extensions Workbench
 
 Workbench is an inbuilt feature provided with each extension in order to assist you to fine tune the extension setup before you actually deploy it on the controller. Please review the following document on [How to use the Extensions WorkBench](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-the-Extensions-WorkBench/ta-p/30130)
