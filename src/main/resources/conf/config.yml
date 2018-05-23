@@ -15,9 +15,7 @@ concurrencyConfig:
   noOfAccountThreads: 3
   noOfRegionThreadsPerAccount: 3
   noOfMetricThreadsPerRegion: 3
-  #Thread timeout in seconds
-  threadTimeOut: 30
-
+  threadTimeOut: 30 #Thread timeout in seconds
 
 #Allowed values for "regions" : ap-northeast-1, ap-southeast-1, ap-southeast-2, eu-central-1, us-east-1, us-west-1, us-west-2, eu-west-1, sa-east-1
 accounts:
@@ -26,8 +24,7 @@ accounts:
     displayAccountName: "AppD"
     regions: ["us-west-2"]
 
-apiNamesList: ""
-
+apiNamesList: []
 
 metricsConfig:
     # Global time range configuration, applicable to all the metrics configured below.
@@ -54,7 +51,6 @@ metricsConfig:
           statType: "ave"
           delta: false
           multiplier: 1
-          aggregationType: "AVERAGE"
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
           metricsTimeRange:
@@ -65,7 +61,6 @@ metricsConfig:
           statType: "ave"
           delta: false
           multiplier: 1
-          aggregationType: "AVERAGE"
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
         - name: "CacheHitCount"
@@ -73,7 +68,6 @@ metricsConfig:
           statType: "ave"
           delta: false
           multiplier: 1
-          aggregationType: "AVERAGE"
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
         - name: "CacheMissCount"
@@ -81,7 +75,6 @@ metricsConfig:
           statType: "ave"
           delta: false
           multiplier: 1
-          aggregationType: "AVERAGE"
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
         - name: "Count"
@@ -89,7 +82,6 @@ metricsConfig:
           statType: "ave"
           delta: false
           multiplier: 1
-          aggregationType: "AVERAGE"
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
         - name: "IntegrationLatency"
@@ -97,7 +89,6 @@ metricsConfig:
           statType: "ave"
           delta: false
           multiplier: 1
-          aggregationType: "AVERAGE"
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
         - name: "Latency"
@@ -105,12 +96,8 @@ metricsConfig:
           statType: "ave"
           delta: false
           multiplier: 1
-          aggregationType: "AVERAGE"
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-
-
-
 
 regionEndPoints:
   ap-northeast-1: monitoring.ap-northeast-1.amazonaws.com
