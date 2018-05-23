@@ -17,13 +17,15 @@ package com.appdynamics.extensions.aws.apigateway.configuration;
 
 import com.appdynamics.extensions.aws.config.Configuration;
 
+import java.util.List;
+
 /**
  * Created by venkata.konala on 4/23/18.
  */
 public class APIGatewayConfiguration extends Configuration {
 
     private Boolean enableAnalytics;
-    private String apiName;
+    private List<String> apiNames;
 
 
     public void setEnableAnalytics(Boolean enableAnalytics) {
@@ -34,11 +36,11 @@ public class APIGatewayConfiguration extends Configuration {
         return enableAnalytics;
     }
 
-    public void setApiName(String apiName) {
-        this.apiName = apiName;
+    public void setApiNames(List<String> apiNames) {
+        this.apiNames = apiNames;
     }
 
-    public String getApiName() {
-        return apiName;
+    public List<String> getApiNames() {
+        return apiNames;
     }
 }

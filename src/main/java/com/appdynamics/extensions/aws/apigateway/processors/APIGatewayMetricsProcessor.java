@@ -17,20 +17,17 @@ package com.appdynamics.extensions.aws.apigateway.processors;
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.model.DimensionFilter;
-import com.appdynamics.extensions.aws.apigateway.ApiNamePredicate;
+import com.appdynamics.extensions.aws.apigateway.ApiNamesPredicate;
 import com.appdynamics.extensions.aws.config.IncludeMetric;
 import com.appdynamics.extensions.aws.dto.AWSMetric;
 import com.appdynamics.extensions.aws.metric.*;
 import com.appdynamics.extensions.aws.metric.processors.MetricsProcessor;
 import com.appdynamics.extensions.aws.metric.processors.MetricsProcessorHelper;
 import com.appdynamics.extensions.metrics.Metric;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
@@ -44,26 +41,45 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     private static final String NAMESPACE = "AWS/ApiGateway";
     private static final String APINAME = "ApiName";
     private List<IncludeMetric> includeMetrics;
-    private String apiName;
+    private List<String> apiNamesList;
 
-    public APIGatewayMetricsProcessor(List<IncludeMetric> includeMetrics, String apiName){
+    public APIGatewayMetricsProcessor(List<IncludeMetric> includeMetrics, List<String> apiNamesList){
         this.includeMetrics = includeMetrics;
-        this.apiName = apiName;
+        this.apiNamesList = apiNamesList;
     }
 
     @Override
     public List<AWSMetric> getMetrics(AmazonCloudWatch awsCloudWatch, String accountName, LongAdder awsRequestsCounter) {
+        /*The dimension being used here for filtering is "ApiName".
+        * Another available dimension is "ApiName" and "Stage".
+        * The "ApiName" dimension filter will retrieve metrics with just the
+        * "ApiName" dimension as well as the metrics with "ApiName" and "Stage"
+        * So there might be redundant metrics. To avoid descrepancy in data,
+        * the aggregationType is made "AVERAGE" and it is not exposed to the
+        * customers.
+        * */
         List<DimensionFilter> dimensionFilters = getDimensionFilters();
-        /*TODO Not required*/
-        ApiNamePredicate apiNamePredicate = new ApiNamePredicate(apiName);
-        return MetricsProcessorHelper.getFilteredMetrics(awsCloudWatch, awsRequestsCounter, NAMESPACE, includeMetrics, dimensionFilters);
+
+        /*The Predicates are used for filtering with the Dimension values.
+        * Since the dimension used for filtering is "ApiName", we can filter
+        * further with the ApiName values.
+        * */
+        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
+
+        return MetricsProcessorHelper.getFilteredMetrics(awsCloudWatch, awsRequestsCounter, NAMESPACE, includeMetrics, dimensionFilters, apiNamesPredicate);
     }
 
     private List<DimensionFilter> getDimensionFilters(){
         List<DimensionFilter> dimensionFilters = Lists.newArrayList();
+
         DimensionFilter apiNameDimensionFilter = new DimensionFilter();
         apiNameDimensionFilter.withName(APINAME);
         dimensionFilters.add(apiNameDimensionFilter);
+
+        /*DimensionFilter stageDimensionFilter = new DimensionFilter();
+        stageDimensionFilter.withName("Stage");
+        dimensionFilters.add(stageDimensionFilter);*/
+
         return dimensionFilters;
     }
 
@@ -81,7 +97,7 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
                     for (MetricStatistic metricStatistic : regionMetricStatistics.getMetricStatisticsList()){
                         String metricPath = createMetricPath(accountMetricStatistics.getAccountName(), regionMetricStatistics.getRegion(), metricStatistic);
                         if(metricStatistic.getValue() != null){
-                            Map<String, ? super Object> metricProperties = Maps.newHashMap();
+                            Map<String, Object> metricProperties = Maps.newHashMap();
                             AWSMetric awsMetric = metricStatistic.getMetric();
                             IncludeMetric includeMetric = awsMetric.getIncludeMetric();
                             metricProperties.put("alias", includeMetric.getAlias());
@@ -101,9 +117,6 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
             }
         }
         return stats;
-        /*Map<String, String> dimensionToMetricPathNameDictionary = Maps.newHashMap();
-        dimensionToMetricPathNameDictionary.put(APINAME, "API Name");
-        return MetricsProcessorHelper.createMetricStatsMapForUpload(namespaceMetricStats, dimensionToMetricPathNameDictionary, false);*/
     }
 
     private String createMetricPath(String accountName, String region, MetricStatistic metricStatistic){

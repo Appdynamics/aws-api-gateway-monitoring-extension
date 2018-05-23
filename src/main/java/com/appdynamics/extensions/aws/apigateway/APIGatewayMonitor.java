@@ -49,7 +49,7 @@ public class APIGatewayMonitor extends SingleNamespaceCloudwatchMonitor<APIGatew
     }
 
     private MetricsProcessor createMetricsProcessor(APIGatewayConfiguration apiGatewayConfiguration){
-        return new APIGatewayMetricsProcessor(apiGatewayConfiguration.getMetricsConfig().getIncludeMetrics(), apiGatewayConfiguration.getApiName());
+        return new APIGatewayMetricsProcessor(apiGatewayConfiguration.getMetricsConfig().getIncludeMetrics(), apiGatewayConfiguration.getApiNames());
     }
 
     @Override
@@ -59,7 +59,7 @@ public class APIGatewayMonitor extends SingleNamespaceCloudwatchMonitor<APIGatew
 
     @Override
     protected String getDefaultMetricPrefix() {
-        return "Custom Metrics|AWS API Gateway";
+        return "Custom Metrics|AWS APIGateway";
     }
 
     @Override
@@ -69,6 +69,6 @@ public class APIGatewayMonitor extends SingleNamespaceCloudwatchMonitor<APIGatew
 
     @Override
     protected int getTaskCount() {
-        return 3;
+        return 1;
     }
 }

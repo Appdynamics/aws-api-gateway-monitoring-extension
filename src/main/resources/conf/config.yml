@@ -24,9 +24,9 @@ accounts:
   - awsAccessKey: ""
     awsSecretKey: ""
     displayAccountName: "AppD"
-    regions: ["us-east-1"]
+    regions: ["us-west-2"]
 
-apiName: ""
+apiNamesList: ""
 
 
 metricsConfig:
