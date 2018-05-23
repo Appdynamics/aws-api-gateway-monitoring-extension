@@ -81,7 +81,7 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
                     for (MetricStatistic metricStatistic : regionMetricStatistics.getMetricStatisticsList()){
                         String metricPath = createMetricPath(accountMetricStatistics.getAccountName(), regionMetricStatistics.getRegion(), metricStatistic);
                         if(metricStatistic.getValue() != null){
-                            Map<String, Object> metricProperties = Maps.newHashMap();
+                            Map<String, ? super Object> metricProperties = Maps.newHashMap();
                             AWSMetric awsMetric = metricStatistic.getMetric();
                             IncludeMetric includeMetric = awsMetric.getIncludeMetric();
                             metricProperties.put("alias", includeMetric.getAlias());
@@ -115,9 +115,8 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
                 .append("|")
                 .append(region)
                 .append("|")
-                .append("API")
-                .append("|")
                 .append(apiName)
+                .append("|")
                 .append(includeMetric.getName());
         return stringBuilder.toString();
 
