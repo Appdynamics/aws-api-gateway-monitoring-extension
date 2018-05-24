@@ -103,10 +103,10 @@ public class ApiNamesPredicateTest {
 
     @Test
     public void emptyApiNamesAndNonEmtyApiNamesInListShouldReturnFalseIfNotMatched(){
-        List<String> apiNamesList = Lists.newArrayList("sampleName1", "");
+        List<String> apiNamesList = Lists.newArrayList("sampleName$", "");
         ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
         when(metric.getDimensions()).thenReturn(Lists.newArrayList(dimension));
-        when(dimension.getValue()).thenReturn("sampleName");
+        when(dimension.getValue()).thenReturn("sampleName1");
         Assert.assertFalse(apiNamesPredicate.apply(metric));
 
     }
