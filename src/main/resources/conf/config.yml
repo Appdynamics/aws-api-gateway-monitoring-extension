@@ -24,7 +24,7 @@ accounts:
     displayAccountName: "AppD"
     regions: ["us-west-2"]
 
-apiNamesList: []
+apiNames: []
 
 metricsConfig:
     # Global time range configuration, applicable to all the metrics configured below.
@@ -79,7 +79,7 @@ metricsConfig:
           clusterRollUpType: "INDIVIDUAL"
         - name: "Count"
           alias: "API count"
-          statType: "ave"
+          statType: "sum"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
