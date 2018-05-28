@@ -13,20 +13,10 @@
  * limitations under the License.
  */
 
-package com.appdynamics.extensions.aws.apigateway.schemas;
+package com.appdynamics.extensions.aws.apigateway.processors;
 
 /**
- * Created by venkata.konala on 5/27/18.
+ * Created by venkata.konala on 5/28/18.
  */
-public class Schema {
-
-    private TraditionalMetricSchema schema;
-
-    public TraditionalMetricSchema getSchema() {
-        return schema;
-    }
-
-    public void setSchema(TraditionalMetricSchema schema) {
-        this.schema = schema;
-    }
+public class ConfigurationMetricsProcessor {
 }

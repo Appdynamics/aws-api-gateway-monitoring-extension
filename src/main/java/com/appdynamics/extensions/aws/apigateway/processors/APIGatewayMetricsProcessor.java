@@ -127,9 +127,9 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     private void uploadToEventsServiceIfEnabled(List<Metric> metricList){
         if(eventsService.isEnable()){
 
-            EventsServiceMetricProcessor eventsServiceMetricProcessor = new EventsServiceMetricProcessor(eventsService);
+            EventsServiceMetricsProcessor eventsServiceMetricsProcessor = new EventsServiceMetricsProcessor(eventsService);
 
-            eventsServiceMetricProcessor.uploadTraditionalMetrics(metricList);
+            eventsServiceMetricsProcessor.uploadTraditionalMetrics(metricList);
 
 
         }
