@@ -92,9 +92,9 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 ## Version
    |          Name            |  Version   |
    |--------------------------|------------|
-   |Extension Version         |1.0.0       |
+   |Extension Version         |2.0.0       |
    |Controller Compatibility  |4.4 or Later|
-   |Last Update               |22 May 2018 |
+   |Last Update               |27 May 2018 |
 
 
 
