@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.appdynamics.extensions.aws.apigateway.processors;
+package com.appdynamics.extensions.aws.apigateway;
 
 import com.appdynamics.extensions.aws.apigateway.configuration.APIGatewayConfiguration;
 import com.appdynamics.extensions.aws.apigateway.configuration.EventsService;
@@ -21,6 +21,7 @@ import com.appdynamics.extensions.aws.apigateway.events.APIMetricEvent;
 import com.appdynamics.extensions.aws.apigateway.events.ResourceMetricEvent;
 import com.appdynamics.extensions.aws.apigateway.events.StageMetricEvent;
 import com.appdynamics.extensions.aws.apigateway.events.TraditonalMetricEvent;
+import com.appdynamics.extensions.aws.apigateway.processors.ConfigurationMetricsProcessor;
 import com.appdynamics.extensions.aws.apigateway.schemas.*;
 import com.appdynamics.extensions.aws.config.Account;
 import com.appdynamics.extensions.metrics.Metric;
@@ -32,6 +33,7 @@ import com.google.gson.Gson;
 import org.apache.http.HttpHost;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -46,9 +48,9 @@ import java.util.Map;
 /**
  * Created by venkata.konala on 5/27/18.
  */
-public class EventsServiceMetricsProcessor {
+public class EventsServiceMetricsWriter {
 
-    private static final Logger logger = Logger.getLogger(EventsServiceMetricsProcessor.class);
+    private static final Logger logger = Logger.getLogger(EventsServiceMetricsWriter.class);
 
     private EventsService eventsService;
 
@@ -61,7 +63,7 @@ public class EventsServiceMetricsProcessor {
     private CloseableHttpClient httpClient;
     private HttpHost httpHost;
 
-    public EventsServiceMetricsProcessor(EventsService eventsService){
+    public EventsServiceMetricsWriter(EventsService eventsService){
         this.eventsService = eventsService;
         initialize();
     }
@@ -83,16 +85,17 @@ public class EventsServiceMetricsProcessor {
         httpHost = new HttpHost(host, port, useSsl ? "https" : "http");
     }
 
-    public void uploadTraditionalMetrics(List<Metric> metricList){
-        if(! eventsSchemaExists("traditionalMetrics")){
-            TraditionalMetricSchema traditionalMetricSchema = new TraditionalMetricSchema();
-            traditionalMetricSchema.setMetricName("string");
-            traditionalMetricSchema.setMetricPath("string");
-            traditionalMetricSchema.setMetricValue("string");
-            Schema schema = new Schema();
-            schema.setSchema(traditionalMetricSchema);
-            createEventsSchema("traditionalMetrics", schema);
+    public void uploadTraditionalMetrics(final List<Metric> metricList){
+        if(eventsSchemaExists("traditionalMetrics")){
+            deleteEventsSchema("traditionalMetrics");
         }
+        TraditionalMetricSchema traditionalMetricSchema = new TraditionalMetricSchema();
+        traditionalMetricSchema.setMetricName("string");
+        traditionalMetricSchema.setMetricPath("string");
+        traditionalMetricSchema.setMetricValue("string");
+        Schema schema = new Schema();
+        schema.setSchema(traditionalMetricSchema);
+        createEventsSchema("traditionalMetrics", schema);
 
         List<TraditonalMetricEvent> traditonalMetricEventList = Lists.newArrayList();
         for(Metric metric : metricList){
@@ -106,62 +109,66 @@ public class EventsServiceMetricsProcessor {
 
     }
 
-    public void uploadAPIMetrics(List<APIMetricEvent> apiMetricEventList){
-        if(! eventsSchemaExists("APIMetrics")){
-            Schema schema = new Schema();
-            APIMetricSchema apiMetricSchema = new APIMetricSchema();
-            apiMetricSchema.setId("string");
-            apiMetricSchema.setApiName("string");
-            apiMetricSchema.setRegion("string");
-            apiMetricSchema.setDescription("string");
-            apiMetricSchema.setDate("date");
-            schema.setSchema(apiMetricSchema);
-            createEventsSchema("APIMetrics", schema);
+    public void uploadAPIMetrics(final List<APIMetricEvent> apiMetricEventList){
+        if(eventsSchemaExists("APIMetrics")){
+            deleteEventsSchema("APIMetrics");
         }
+        Schema schema = new Schema();
+        APIMetricSchema apiMetricSchema = new APIMetricSchema();
+        apiMetricSchema.setId("string");
+        apiMetricSchema.setApiName("string");
+        apiMetricSchema.setRegion("string");
+        apiMetricSchema.setDescription("string");
+        apiMetricSchema.setDate("date");
+        schema.setSchema(apiMetricSchema);
+        createEventsSchema("APIMetrics", schema);
         publishEvents("APIMetrics", apiMetricEventList);
 
     }
 
-    public void uploadResourceMetrics(List<ResourceMetricEvent> resourceMetricEventList){
-        if(! eventsSchemaExists("ResourceMetrics")){
-            Schema schema = new Schema();
-            ResourceMetricSchema resourceMetricSchema = new ResourceMetricSchema();
-            resourceMetricSchema.setRestApiId("string");
-            resourceMetricSchema.setRestApiName("string");
-            resourceMetricSchema.setRegion("string");
-            resourceMetricSchema.setId("string");
-            resourceMetricSchema.setParentId("string");
-            resourceMetricSchema.setPath("string");
-            resourceMetricSchema.setPathPart("string");
-            resourceMetricSchema.setMethods("string");
-            schema.setSchema(resourceMetricSchema);
-            createEventsSchema("ResourceMetrics", schema);
+    public void uploadResourceMetrics(final List<ResourceMetricEvent> resourceMetricEventList){
+        if(eventsSchemaExists("ResourceMetrics")){
+            deleteEventsSchema("ResourceMetrics");
         }
+        Schema schema = new Schema();
+        ResourceMetricSchema resourceMetricSchema = new ResourceMetricSchema();
+        resourceMetricSchema.setRestApiId("string");
+        resourceMetricSchema.setRestApiName("string");
+        resourceMetricSchema.setRegion("string");
+        resourceMetricSchema.setId("string");
+        resourceMetricSchema.setParentId("string");
+        resourceMetricSchema.setPath("string");
+        resourceMetricSchema.setPathPart("string");
+        resourceMetricSchema.setMethods("string");
+        schema.setSchema(resourceMetricSchema);
+        createEventsSchema("ResourceMetrics", schema);
         publishEvents("ResourceMetrics", resourceMetricEventList);
 
     }
 
-    public void uploadStageMetrics(List<StageMetricEvent> stageMetricEventList){
-        if(! eventsSchemaExists("StageMetrics")){
-            Schema schema = new Schema();
-            StageMetricSchema stageMetricSchema = new StageMetricSchema();
-            stageMetricSchema.setRestApiName("string");
-            stageMetricSchema.setRegion("string");
-            stageMetricSchema.setStageName("string");
-            stageMetricSchema.setDeploymentId("string");
-            stageMetricSchema.setCacheClusterEnabled("boolean");
-            stageMetricSchema.setCacheClusterSize("string");
-            stageMetricSchema.setCacheClusterStatus("string");
-            stageMetricSchema.setLastUpdatedDate("date");
-            stageMetricSchema.setCreatedDate("date");
-            schema.setSchema(stageMetricSchema);
-            createEventsSchema("StageMetrics", schema);
+    public void uploadStageMetrics(final List<StageMetricEvent> stageMetricEventList){
+        if(eventsSchemaExists("StageMetrics")){
+            deleteEventsSchema("StageMetrics");
         }
+        Schema schema = new Schema();
+        StageMetricSchema stageMetricSchema = new StageMetricSchema();
+        stageMetricSchema.setRestApiName("string");
+        stageMetricSchema.setRegion("string");
+        stageMetricSchema.setStageName("string");
+        stageMetricSchema.setDeploymentId("string");
+        stageMetricSchema.setCacheClusterEnabled("boolean");
+        stageMetricSchema.setCacheClusterSize("string");
+        stageMetricSchema.setCacheClusterStatus("string");
+        stageMetricSchema.setLastUpdatedDate("date");
+        stageMetricSchema.setCreatedDate("date");
+        schema.setSchema(stageMetricSchema);
+        createEventsSchema("StageMetrics", schema);
+
         publishEvents("StageMetrics", stageMetricEventList);
 
     }
 
-    private boolean eventsSchemaExists(String schema){
+    private boolean eventsSchemaExists(final String schema){
         HttpGet httpGet = new HttpGet(httpHost.toURI() + "/events/schema/" + schema);
         httpGet.setHeader("X-Events-API-AccountName", accountName);
         httpGet.setHeader("X-Events-API-Key", apiKey);
@@ -191,7 +198,36 @@ public class EventsServiceMetricsProcessor {
         return false;
     }
 
-    private void createEventsSchema(String schema, Object object){
+    private void deleteEventsSchema(final String schema){
+        HttpDelete httpDelete = new HttpDelete(httpHost.toURI() + "/events/schema/" + schema);
+        httpDelete.setHeader("X-Events-API-AccountName", accountName);
+        httpDelete.setHeader("X-Events-API-Key", apiKey);
+        httpDelete.setHeader("Content-type", "application/vnd.appd.events+json;v=2");
+        StatusLine statusLine;
+        CloseableHttpResponse response = null;
+        try {
+            response = httpClient.execute(httpDelete);
+            if (response != null && (statusLine = response.getStatusLine()) != null && statusLine.getStatusCode() == 200 ){
+                logger.debug("Successfully deleted {} schema" + schema);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if(response != null){
+                try {
+                    response.close();
+                }
+                catch(Exception e){
+                    logger.error("Error while closing the response" + e.getMessage());
+
+                }
+            }
+        }
+    }
+
+    private void createEventsSchema(final String schema, final Object object){
         CloseableHttpResponse response = null;
         try {
             Gson gson = new Gson();
@@ -226,7 +262,7 @@ public class EventsServiceMetricsProcessor {
 
     }
 
-    private void publishEvents(String schema, Object object){
+    private void publishEvents(final String schema, final Object object){
         CloseableHttpResponse response = null;
         try {
             Gson gson = new Gson();
@@ -280,15 +316,15 @@ public class EventsServiceMetricsProcessor {
         credentials.put("EventsAPIKey", "302c8c2b-5be8-4cb5-a5c4-30e0e57a49e1");
         eventsService.setCredentials(credentials);
 
-        EventsServiceMetricsProcessor eventsServiceMetricsProcessor = new EventsServiceMetricsProcessor(eventsService);
+        EventsServiceMetricsWriter eventsServiceMetricsWriter = new EventsServiceMetricsWriter(eventsService);
 
-        ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsProcessor);
+        ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsWriter);
         configurationMetricsProcessor.uploadConfigurationMetrics();
 
         /*List<Metric> metricList = Lists.newArrayList();
         Metric metric = new Metric("hits", "20.0", "Server1|hits");
         metricList.add(metric);
-        eventsServiceMetricsProcessor.uploadTraditionalMetrics(metricList);*/
+        eventsServiceMetricsWriter.uploadTraditionalMetrics(metricList);*/
     }
 
 

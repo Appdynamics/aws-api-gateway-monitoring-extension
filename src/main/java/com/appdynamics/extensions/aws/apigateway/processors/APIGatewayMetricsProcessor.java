@@ -18,6 +18,7 @@ package com.appdynamics.extensions.aws.apigateway.processors;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.model.DimensionFilter;
 import com.appdynamics.extensions.aws.apigateway.ApiNamesPredicate;
+import com.appdynamics.extensions.aws.apigateway.EventsServiceMetricsWriter;
 import com.appdynamics.extensions.aws.apigateway.configuration.APIGatewayConfiguration;
 import com.appdynamics.extensions.aws.apigateway.configuration.EventsService;
 import com.appdynamics.extensions.aws.config.IncludeMetric;
@@ -129,11 +130,11 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
 
     private void uploadToEventsServiceIfEnabled(List<Metric> metricList){
         if(eventsService != null && eventsService.isEnable()){
-            EventsServiceMetricsProcessor eventsServiceMetricsProcessor = new EventsServiceMetricsProcessor(eventsService);
-            ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsProcessor);
-
-            eventsServiceMetricsProcessor.uploadTraditionalMetrics(metricList);
-
+            EventsServiceMetricsWriter eventsServiceMetricsWriter = new EventsServiceMetricsWriter(eventsService);
+            ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsWriter);
+            if(eventsService.isTraditonalMetricsEnable()) {
+                eventsServiceMetricsWriter.uploadTraditionalMetrics(metricList);
+            }
             configurationMetricsProcessor.uploadConfigurationMetrics();
         }
         else{

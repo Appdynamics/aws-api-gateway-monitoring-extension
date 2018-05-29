@@ -21,7 +21,9 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.apigateway.AmazonApiGatewayClient;
 import com.amazonaws.services.apigateway.model.*;
+import com.appdynamics.extensions.aws.apigateway.EventsServiceMetricsWriter;
 import com.appdynamics.extensions.aws.apigateway.configuration.APIGatewayConfiguration;
+import com.appdynamics.extensions.aws.apigateway.configuration.EventsService;
 import com.appdynamics.extensions.aws.apigateway.events.APIMetricEvent;
 import com.appdynamics.extensions.aws.apigateway.events.ResourceMetricEvent;
 import com.appdynamics.extensions.aws.apigateway.events.StageMetricEvent;
@@ -41,12 +43,13 @@ import java.util.Map;
 public class ConfigurationMetricsProcessor {
 
     private APIGatewayConfiguration apiGatewayConfiguration;
+    private EventsService eventsService;
+    private EventsServiceMetricsWriter eventsServiceMetricsWriter;
 
-    private EventsServiceMetricsProcessor eventsServiceMetricsProcessor;
-
-    public ConfigurationMetricsProcessor(APIGatewayConfiguration apiGatewayConfiguration, EventsServiceMetricsProcessor eventsServiceMetricsProcessor){
+    public ConfigurationMetricsProcessor(APIGatewayConfiguration apiGatewayConfiguration, EventsServiceMetricsWriter eventsServiceMetricsWriter){
         this.apiGatewayConfiguration = apiGatewayConfiguration;
-        this.eventsServiceMetricsProcessor = eventsServiceMetricsProcessor;
+        this.eventsService = apiGatewayConfiguration.getEventsService();
+        this.eventsServiceMetricsWriter = eventsServiceMetricsWriter;
     }
 
     public void uploadConfigurationMetrics(){
@@ -70,7 +73,7 @@ public class ConfigurationMetricsProcessor {
         }
     }
 
-    private List<APIMetricEvent> uploadRestApisData(AmazonApiGatewayClient amazonApiGatewayClient, String region){
+    private List<APIMetricEvent> uploadRestApisData(final AmazonApiGatewayClient amazonApiGatewayClient, final String region){
         List<APIMetricEvent> apiMetricEventList = Lists.newArrayList();
         List<ResourceMetricEvent> resourceMetricEventList = Lists.newArrayList();
         List<StageMetricEvent> stageMetricEventList = Lists.newArrayList();
@@ -96,19 +99,29 @@ public class ConfigurationMetricsProcessor {
 
             apiMetricEventList.add(apiMetricEvent);
 
-            List<ResourceMetricEvent> restApiResourceMetricEventList = getResourcesData(amazonApiGatewayClient, region, id, name);
-            resourceMetricEventList.addAll(restApiResourceMetricEventList);
-            List<StageMetricEvent> restApiStageMetricEventList = getStagesData(amazonApiGatewayClient, region, id, name);
-            stageMetricEventList.addAll(restApiStageMetricEventList);
+            if (eventsService.isResourceMetricsEnable()) {
+                List<ResourceMetricEvent> restApiResourceMetricEventList = getResourcesData(amazonApiGatewayClient, region, id, name);
+                resourceMetricEventList.addAll(restApiResourceMetricEventList);
+            }
+            if (eventsService.isStageMetricsEnable()) {
+                List<StageMetricEvent> restApiStageMetricEventList = getStagesData(amazonApiGatewayClient, region, id, name);
+                stageMetricEventList.addAll(restApiStageMetricEventList);
+            }
         }
-        //eventsServiceMetricsProcessor.uploadResourceMetrics(resourceMetricEventList);
-        eventsServiceMetricsProcessor.uploadStageMetrics(stageMetricEventList);
-        eventsServiceMetricsProcessor.uploadAPIMetrics(apiMetricEventList);;
+        if(eventsService.isResourceMetricsEnable()) {
+            eventsServiceMetricsWriter.uploadResourceMetrics(resourceMetricEventList);
+        }
+        if(eventsService.isStageMetricsEnable()) {
+            eventsServiceMetricsWriter.uploadStageMetrics(stageMetricEventList);
+        }
+        if(eventsService.isApiMetricsEnable()) {
+            eventsServiceMetricsWriter.uploadAPIMetrics(apiMetricEventList);
+        }
         return apiMetricEventList;
     }
 
 
-    private List<ResourceMetricEvent> getResourcesData(AmazonApiGatewayClient amazonApiGatewayClient, String region, String restApiId, String restApiName){
+    private List<ResourceMetricEvent> getResourcesData(final AmazonApiGatewayClient amazonApiGatewayClient, final String region, final String restApiId, final String restApiName){
         List<ResourceMetricEvent> resourceMetricEvents = Lists.newArrayList();
 
         GetResourcesRequest resourcesRequest = new GetResourcesRequest();
@@ -144,7 +157,7 @@ public class ConfigurationMetricsProcessor {
         return resourceMetricEvents;
     }
 
-    private List<StageMetricEvent> getStagesData(AmazonApiGatewayClient amazonApiGatewayClient, String region, String restApiId, String restApiName){
+    private List<StageMetricEvent> getStagesData(final AmazonApiGatewayClient amazonApiGatewayClient, final String region, final String restApiId, final String restApiName){
         List<StageMetricEvent> stageMetricEvents = Lists.newArrayList();
 
         GetStagesRequest stagesRequest = new GetStagesRequest();
@@ -175,17 +188,6 @@ public class ConfigurationMetricsProcessor {
 
             stageMetricEvent.setLastUpdatedDate(dateAsString);
             stageMetricEvent.setCreatedDate(dateAsString2);
-
-            /*StringBuilder methodsBuilder = new StringBuilder();
-            Map<String, Method> resourceMethods = stage.getResourceMethods();
-            if(resourceMethods != null) {
-                for (Map.Entry<String, Method> entry : resourceMethods.entrySet()) {
-                    String resourceMethodName = entry.getKey();
-                    Method method = entry.getValue();
-                    methodsBuilder.append(resourceMethodName + " ");
-                }
-            }*/
-
 
             stageMetricEvents.add(stageMetricEvent);
         }

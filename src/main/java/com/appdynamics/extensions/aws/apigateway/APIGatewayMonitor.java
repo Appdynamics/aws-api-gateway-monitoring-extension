@@ -39,29 +39,6 @@ public class APIGatewayMonitor extends SingleNamespaceCloudwatchMonitor<APIGatew
         super(APIGatewayConfiguration.class);
     }
 
-   /* @Override
-    protected void onConfigReload(File file) {
-        super.onConfigReload(file);
-        eventsServiceEnabledCheck(file);
-    }
-
-    private void eventsServiceEnabledCheck(File file){
-        Yaml yaml = new Yaml();
-        APIGatewayConfiguration apiGatewayConfiguration;
-        try {
-            apiGatewayConfiguration = yaml.loadAs(new FileInputStream(file), APIGatewayConfiguration.class);
-            if (apiGatewayConfiguration.getEnableAnalytics() != null && apiGatewayConfiguration.getEnableAnalytics()){
-                eventsServiceEnabled = true;
-            }
-            else {
-                eventsServiceEnabled = false;
-            }
-        }
-        catch(Exception e){
-            logger.debug("Error while reading the config file : ", e);
-        }
-    }*/
-
     @Override
     protected NamespaceMetricStatisticsCollector getNamespaceMetricsCollector(APIGatewayConfiguration apiGatewayConfiguration) {
 

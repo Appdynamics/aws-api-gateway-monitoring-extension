@@ -23,8 +23,11 @@ import java.util.Map;
 public class EventsService {
 
     private boolean enable;
-
     private Map<String, ?> credentials;
+    private boolean traditonalMetricsEnable;
+    private boolean apiMetricsEnable;
+    private boolean resourceMetricsEnable;
+    private boolean stageMetricsEnable;
 
     public boolean isEnable() {
         return enable;
@@ -40,5 +43,37 @@ public class EventsService {
 
     public void setCredentials(Map<String, ?> credentials) {
         this.credentials = credentials;
+    }
+
+    public boolean isTraditonalMetricsEnable() {
+        return traditonalMetricsEnable;
+    }
+
+    public void setTraditonalMetricsEnable(boolean traditonalMetricsEnable) {
+        this.traditonalMetricsEnable = traditonalMetricsEnable;
+    }
+
+    public boolean isApiMetricsEnable() {
+        return apiMetricsEnable;
+    }
+
+    public void setApiMetricsEnable(boolean apiMetricsEnable) {
+        this.apiMetricsEnable = apiMetricsEnable;
+    }
+
+    public boolean isResourceMetricsEnable() {
+        return resourceMetricsEnable;
+    }
+
+    public void setResourceMetricsEnable(boolean resourceMetricsEnable) {
+        this.resourceMetricsEnable = resourceMetricsEnable;
+    }
+
+    public boolean isStageMetricsEnable() {
+        return stageMetricsEnable;
+    }
+
+    public void setStageMetricsEnable(boolean stageMetricsEnable) {
+        this.stageMetricsEnable = stageMetricsEnable;
     }
 }
