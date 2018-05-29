@@ -77,7 +77,7 @@ public class APIGatewayMonitor extends SingleNamespaceCloudwatchMonitor<APIGatew
     }
 
     private MetricsProcessor createMetricsProcessor(APIGatewayConfiguration apiGatewayConfiguration){
-        return new APIGatewayMetricsProcessor(apiGatewayConfiguration.getMetricsConfig().getIncludeMetrics(), apiGatewayConfiguration.getApiNames(), apiGatewayConfiguration.getEventsService());
+        return new APIGatewayMetricsProcessor(apiGatewayConfiguration);
     }
 
     @Override

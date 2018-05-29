@@ -15,15 +15,19 @@
 
 package com.appdynamics.extensions.aws.apigateway.processors;
 
+import com.appdynamics.extensions.aws.apigateway.configuration.APIGatewayConfiguration;
 import com.appdynamics.extensions.aws.apigateway.configuration.EventsService;
-import com.appdynamics.extensions.aws.apigateway.events.MetricEvent;
-import com.appdynamics.extensions.aws.apigateway.events.TraditionalMetricEvents;
-import com.appdynamics.extensions.aws.apigateway.schemas.Schema;
-import com.appdynamics.extensions.aws.apigateway.schemas.TraditionalMetricSchema;
+import com.appdynamics.extensions.aws.apigateway.events.APIMetricEvent;
+import com.appdynamics.extensions.aws.apigateway.events.ResourceMetricEvent;
+import com.appdynamics.extensions.aws.apigateway.events.StageMetricEvent;
+import com.appdynamics.extensions.aws.apigateway.events.TraditonalMetricEvent;
+import com.appdynamics.extensions.aws.apigateway.schemas.*;
+import com.appdynamics.extensions.aws.config.Account;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.util.AssertUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import org.apache.http.HttpHost;
 import org.apache.http.StatusLine;
@@ -80,53 +84,114 @@ public class EventsServiceMetricsProcessor {
     }
 
     public void uploadTraditionalMetrics(List<Metric> metricList){
-        if(! eventsSchemaExists("standardMetrics")){
+        if(! eventsSchemaExists("traditionalMetrics")){
             TraditionalMetricSchema traditionalMetricSchema = new TraditionalMetricSchema();
             traditionalMetricSchema.setMetricName("string");
             traditionalMetricSchema.setMetricPath("string");
             traditionalMetricSchema.setMetricValue("string");
             Schema schema = new Schema();
             schema.setSchema(traditionalMetricSchema);
-            createEventsSchema("standardMetrics", schema);
+            createEventsSchema("traditionalMetrics", schema);
         }
 
-        TraditionalMetricEvents traditionalMetricEvents = new TraditionalMetricEvents();
-        List<MetricEvent> metricEventList = Lists.newArrayList();
+        List<TraditonalMetricEvent> traditonalMetricEventList = Lists.newArrayList();
         for(Metric metric : metricList){
-            MetricEvent metricEvent = new MetricEvent();
-            metricEvent.setMetricName(metric.getMetricName());
-            metricEvent.setMetricPath(metric.getMetricPath());
-            metricEvent.setMetricValue(metric.getMetricValue());
-            metricEventList.add(metricEvent);
+            TraditonalMetricEvent traditonalMetricEvent = new TraditonalMetricEvent();
+            traditonalMetricEvent.setMetricName(metric.getMetricName());
+            traditonalMetricEvent.setMetricPath(metric.getMetricPath());
+            traditonalMetricEvent.setMetricValue(metric.getMetricValue());
+            traditonalMetricEventList.add(traditonalMetricEvent);
         }
-        traditionalMetricEvents.setEventsList(metricEventList);
-        publishEvents("standardMetrics", traditionalMetricEvents.getEventsList());
+        publishEvents("traditionalMetrics", traditonalMetricEventList);
+
+    }
+
+    public void uploadAPIMetrics(List<APIMetricEvent> apiMetricEventList){
+        if(! eventsSchemaExists("APIMetrics")){
+            Schema schema = new Schema();
+            APIMetricSchema apiMetricSchema = new APIMetricSchema();
+            apiMetricSchema.setId("string");
+            apiMetricSchema.setApiName("string");
+            apiMetricSchema.setRegion("string");
+            apiMetricSchema.setDescription("string");
+            apiMetricSchema.setDate("date");
+            schema.setSchema(apiMetricSchema);
+            createEventsSchema("APIMetrics", schema);
+        }
+        publishEvents("APIMetrics", apiMetricEventList);
+
+    }
+
+    public void uploadResourceMetrics(List<ResourceMetricEvent> resourceMetricEventList){
+        if(! eventsSchemaExists("ResourceMetrics")){
+            Schema schema = new Schema();
+            ResourceMetricSchema resourceMetricSchema = new ResourceMetricSchema();
+            resourceMetricSchema.setRestApiId("string");
+            resourceMetricSchema.setRestApiName("string");
+            resourceMetricSchema.setRegion("string");
+            resourceMetricSchema.setId("string");
+            resourceMetricSchema.setParentId("string");
+            resourceMetricSchema.setPath("string");
+            resourceMetricSchema.setPathPart("string");
+            resourceMetricSchema.setMethods("string");
+            schema.setSchema(resourceMetricSchema);
+            createEventsSchema("ResourceMetrics", schema);
+        }
+        publishEvents("ResourceMetrics", resourceMetricEventList);
+
+    }
+
+    public void uploadStageMetrics(List<StageMetricEvent> stageMetricEventList){
+        if(! eventsSchemaExists("StageMetrics")){
+            /*Schema schema = new Schema();
+            StageMetricSchema stageMetricSchema = new StageMetricSchema();
+            stageMetricSchema.setId("string");
+            stageMetricSchema.setApiName("string");
+            stageMetricSchema.setRegion("string");
+            stageMetricSchema.setDescription("string");
+            stageMetricSchema.setDate("date");
+            schema.setSchema(stageMetricSchema);
+            createEventsSchema("StageMetrics", schema);*/
+        }
+        publishEvents("StageMetrics", stageMetricEventList);
 
     }
 
     private boolean eventsSchemaExists(String schema){
-        HttpGet httpGet = new HttpGet("http://localhost:9080" + "/events/schema/" + schema);
+        HttpGet httpGet = new HttpGet(httpHost.toURI() + "/events/schema/" + schema);
         httpGet.setHeader("X-Events-API-AccountName", accountName);
         httpGet.setHeader("X-Events-API-Key", apiKey);
         httpGet.setHeader("Content-type", "application/vnd.appd.events+json;v=2");
         StatusLine statusLine;
-
+        CloseableHttpResponse response = null;
         try {
-            CloseableHttpResponse response = httpClient.execute(httpGet);
+            response = httpClient.execute(httpGet);
             if (response != null && (statusLine = response.getStatusLine()) != null && statusLine.getStatusCode() == 200 ){
                 return true;
             }
-
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+            if(response != null){
+                try {
+                    response.close();
+                }
+                catch(Exception e){
+                    logger.error("Error while closing the response" + e.getMessage());
+
+                }
+            }
         }
         return false;
     }
 
     private void createEventsSchema(String schema, Object object){
+        CloseableHttpResponse response = null;
         try {
             Gson gson = new Gson();
-            HttpPost httpPost = new HttpPost("http://localhost:9080" + "/events/schema/" + schema);
+            HttpPost httpPost = new HttpPost(httpHost.toURI() + "/events/schema/" + schema);
             httpPost.setHeader("X-Events-API-AccountName", accountName);
             httpPost.setHeader("X-Events-API-Key", apiKey);
             httpPost.setHeader("Content-Type", "application/vnd.appd.events+json;v=2");
@@ -134,21 +199,34 @@ public class EventsServiceMetricsProcessor {
             String entity = gson.toJson(object);
             httpPost.setEntity(new StringEntity(entity));
             StatusLine statusLine;
-            CloseableHttpResponse response = httpClient.execute(httpPost);
+            response = httpClient.execute(httpPost);
             if (response != null && (statusLine = response.getStatusLine()) != null && statusLine.getStatusCode() == 201 ){
                 logger.debug("{} created !!" +  schema);
             }
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
+        finally {
+            if(response != null){
+                try {
+                    response.close();
+                }
+                catch(Exception e){
+                    logger.error("Error while closing the response" + e.getMessage());
+
+                }
+            }
+        }
+
     }
 
     private void publishEvents(String schema, Object object){
-
+        CloseableHttpResponse response = null;
         try {
             Gson gson = new Gson();
-            HttpPost httpPost = new HttpPost("http://localhost:9080" + "/events/publish/" + schema);
+            HttpPost httpPost = new HttpPost(httpHost.toURI() + "/events/publish/" + schema);
             httpPost.setHeader("X-Events-API-AccountName", accountName);
             httpPost.setHeader("X-Events-API-Key", apiKey);
             httpPost.setHeader("Content-Type", "application/vnd.appd.events+json;v=2");
@@ -156,22 +234,40 @@ public class EventsServiceMetricsProcessor {
             String entity = gson.toJson(object);
             httpPost.setEntity(new StringEntity(entity));
             StatusLine statusLine;
-            CloseableHttpResponse response = httpClient.execute(httpPost);
+            response = httpClient.execute(httpPost);
             if (response != null && (statusLine = response.getStatusLine()) != null && statusLine.getStatusCode() == 200 ){
                 logger.debug("Events published for {} !!" +  schema);
             }
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+            if(response != null){
+                try {
+                    response.close();
+                }
+                catch(Exception e){
+                    logger.error("Error while closing the response" + e.getMessage());
+
+                }
+            }
         }
 
     }
 
     public static void main(String args[]){
 
+        APIGatewayConfiguration apiGatewayConfiguration = new APIGatewayConfiguration();
+        Account account = new Account();
+        account.setAwsAccessKey("");
+        account.setAwsSecretKey("");
+        account.setRegions(Sets.newHashSet("us-west-2"));
+        apiGatewayConfiguration.setAccounts(Lists.newArrayList(account));
+
         EventsService eventsService = new EventsService();
         eventsService.setEnable(true);
-
         Map<String, Object> credentials = Maps.newHashMap();
         credentials.put("ControllerEventsServiceHost", "localhost");
         credentials.put("ControllerEventsServicePort", 9080);
@@ -182,10 +278,13 @@ public class EventsServiceMetricsProcessor {
 
         EventsServiceMetricsProcessor eventsServiceMetricsProcessor = new EventsServiceMetricsProcessor(eventsService);
 
-        List<Metric> metricList = Lists.newArrayList();
+        ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsProcessor);
+        configurationMetricsProcessor.uploadConfigurationMetrics();
+
+        /*List<Metric> metricList = Lists.newArrayList();
         Metric metric = new Metric("hits", "20.0", "Server1|hits");
         metricList.add(metric);
-        eventsServiceMetricsProcessor.uploadTraditionalMetrics(metricList);
+        eventsServiceMetricsProcessor.uploadTraditionalMetrics(metricList);*/
     }
 
 

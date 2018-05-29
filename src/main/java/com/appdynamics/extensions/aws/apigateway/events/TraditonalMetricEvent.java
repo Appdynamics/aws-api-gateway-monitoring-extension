@@ -18,7 +18,7 @@ package com.appdynamics.extensions.aws.apigateway.events;
 /**
  * Created by venkata.konala on 5/27/18.
  */
-public class MetricEvent {
+public class TraditonalMetricEvent {
 
     private String metricName;
 

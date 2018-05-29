@@ -18,6 +18,7 @@ package com.appdynamics.extensions.aws.apigateway.processors;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.model.DimensionFilter;
 import com.appdynamics.extensions.aws.apigateway.ApiNamesPredicate;
+import com.appdynamics.extensions.aws.apigateway.configuration.APIGatewayConfiguration;
 import com.appdynamics.extensions.aws.apigateway.configuration.EventsService;
 import com.appdynamics.extensions.aws.config.IncludeMetric;
 import com.appdynamics.extensions.aws.dto.AWSMetric;
@@ -44,12 +45,14 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     private static final String APINAME = "ApiName";
     private List<IncludeMetric> includeMetrics;
     private List<String> apiNamesList;
+    private APIGatewayConfiguration apiGatewayConfiguration;
     private EventsService eventsService;
 
-    public APIGatewayMetricsProcessor(List<IncludeMetric> includeMetrics, List<String> apiNamesList, EventsService eventsService){
-        this.includeMetrics = includeMetrics;
-        this.apiNamesList = apiNamesList;
-        this.eventsService = eventsService;
+    public APIGatewayMetricsProcessor(APIGatewayConfiguration apiGatewayConfiguration){
+        this.apiGatewayConfiguration = apiGatewayConfiguration;
+        this.includeMetrics = apiGatewayConfiguration.getMetricsConfig().getIncludeMetrics();
+        this.apiNamesList = apiGatewayConfiguration.getApiNames();
+        this.eventsService = apiGatewayConfiguration.getEventsService();
     }
 
     @Override
@@ -125,13 +128,16 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     }
 
     private void uploadToEventsServiceIfEnabled(List<Metric> metricList){
-        if(eventsService.isEnable()){
-
+        if(eventsService != null && eventsService.isEnable()){
             EventsServiceMetricsProcessor eventsServiceMetricsProcessor = new EventsServiceMetricsProcessor(eventsService);
+            ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsProcessor);
 
             eventsServiceMetricsProcessor.uploadTraditionalMetrics(metricList);
 
-
+            configurationMetricsProcessor.uploadConfigurationMetrics();
+        }
+        else{
+            logger.debug("EventsService metrics are not enabled!!!!");
         }
     }
 

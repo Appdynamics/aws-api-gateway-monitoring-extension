@@ -13,22 +13,10 @@
  * limitations under the License.
  */
 
-package com.appdynamics.extensions.aws.apigateway.events;
-
-import java.util.List;
+package com.appdynamics.extensions.aws.apigateway.schemas;
 
 /**
- * Created by venkata.konala on 5/27/18.
+ * Created by venkata.konala on 5/28/18.
  */
-public class TraditionalMetricEvents {
-
-    private List<MetricEvent> eventsList;
-
-    public List<MetricEvent> getEventsList() {
-        return eventsList;
-    }
-
-    public void setEventsList(List<MetricEvent> eventsList) {
-        this.eventsList = eventsList;
-    }
+public class StageMetricSchema {
 }

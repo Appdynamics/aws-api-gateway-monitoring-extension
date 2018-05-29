@@ -13,20 +13,10 @@
  * limitations under the License.
  */
 
-package com.appdynamics.extensions.aws.apigateway.schemas;
+package com.appdynamics.extensions.aws.apigateway.events;
 
 /**
- * Created by venkata.konala on 5/27/18.
+ * Created by venkata.konala on 5/28/18.
  */
-public class Schema<T> {
-
-    private T schema;
-
-    public T getSchema() {
-        return schema;
-    }
-
-    public void setSchema(T schema) {
-        this.schema = schema;
-    }
+public class StageMetricEvent {
 }
