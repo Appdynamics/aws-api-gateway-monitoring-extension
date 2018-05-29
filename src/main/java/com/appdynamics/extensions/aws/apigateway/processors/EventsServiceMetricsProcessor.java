@@ -143,15 +143,19 @@ public class EventsServiceMetricsProcessor {
 
     public void uploadStageMetrics(List<StageMetricEvent> stageMetricEventList){
         if(! eventsSchemaExists("StageMetrics")){
-            /*Schema schema = new Schema();
+            Schema schema = new Schema();
             StageMetricSchema stageMetricSchema = new StageMetricSchema();
-            stageMetricSchema.setId("string");
-            stageMetricSchema.setApiName("string");
+            stageMetricSchema.setRestApiName("string");
             stageMetricSchema.setRegion("string");
-            stageMetricSchema.setDescription("string");
-            stageMetricSchema.setDate("date");
+            stageMetricSchema.setStageName("string");
+            stageMetricSchema.setDeploymentId("string");
+            stageMetricSchema.setCacheClusterEnabled("boolean");
+            stageMetricSchema.setCacheClusterSize("string");
+            stageMetricSchema.setCacheClusterStatus("string");
+            stageMetricSchema.setLastUpdatedDate("date");
+            stageMetricSchema.setCreatedDate("date");
             schema.setSchema(stageMetricSchema);
-            createEventsSchema("StageMetrics", schema);*/
+            createEventsSchema("StageMetrics", schema);
         }
         publishEvents("StageMetrics", stageMetricEventList);
 

@@ -24,8 +24,8 @@ import com.amazonaws.services.apigateway.model.*;
 import com.appdynamics.extensions.aws.apigateway.configuration.APIGatewayConfiguration;
 import com.appdynamics.extensions.aws.apigateway.events.APIMetricEvent;
 import com.appdynamics.extensions.aws.apigateway.events.ResourceMetricEvent;
+import com.appdynamics.extensions.aws.apigateway.events.StageMetricEvent;
 import com.appdynamics.extensions.aws.config.Account;
-import com.appdynamics.extensions.metrics.Metric;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -64,15 +64,16 @@ public class ConfigurationMetricsProcessor {
 
             for(String region : account.getRegions()){
                 amazonApiGatewayClient.setRegion(Region.getRegion(Regions.fromName(region)));
-                List<APIMetricEvent> apiMetricEventList = getRestApisData(amazonApiGatewayClient, region);
-                eventsServiceMetricsProcessor.uploadAPIMetrics(apiMetricEventList);
+                uploadRestApisData(amazonApiGatewayClient, region);
+
             }
         }
     }
 
-    private List<APIMetricEvent> getRestApisData(AmazonApiGatewayClient amazonApiGatewayClient, String region){
+    private List<APIMetricEvent> uploadRestApisData(AmazonApiGatewayClient amazonApiGatewayClient, String region){
         List<APIMetricEvent> apiMetricEventList = Lists.newArrayList();
         List<ResourceMetricEvent> resourceMetricEventList = Lists.newArrayList();
+        List<StageMetricEvent> stageMetricEventList = Lists.newArrayList();
 
         GetRestApisRequest restApisRequest = new GetRestApisRequest();
         GetRestApisResult restApisResult = amazonApiGatewayClient.getRestApis(restApisRequest);
@@ -97,9 +98,12 @@ public class ConfigurationMetricsProcessor {
 
             List<ResourceMetricEvent> restApiResourceMetricEventList = getResourcesData(amazonApiGatewayClient, region, id, name);
             resourceMetricEventList.addAll(restApiResourceMetricEventList);
+            List<StageMetricEvent> restApiStageMetricEventList = getStagesData(amazonApiGatewayClient, region, id, name);
+            stageMetricEventList.addAll(restApiStageMetricEventList);
         }
-
-        eventsServiceMetricsProcessor.uploadResourceMetrics(resourceMetricEventList);
+        //eventsServiceMetricsProcessor.uploadResourceMetrics(resourceMetricEventList);
+        eventsServiceMetricsProcessor.uploadStageMetrics(stageMetricEventList);
+        eventsServiceMetricsProcessor.uploadAPIMetrics(apiMetricEventList);;
         return apiMetricEventList;
     }
 
@@ -138,6 +142,54 @@ public class ConfigurationMetricsProcessor {
             resourceMetricEvents.add(resourceMetricEvent);
         }
         return resourceMetricEvents;
+    }
+
+    private List<StageMetricEvent> getStagesData(AmazonApiGatewayClient amazonApiGatewayClient, String region, String restApiId, String restApiName){
+        List<StageMetricEvent> stageMetricEvents = Lists.newArrayList();
+
+        GetStagesRequest stagesRequest = new GetStagesRequest();
+        stagesRequest.setRestApiId(restApiId);
+        GetStagesResult stagesResult = amazonApiGatewayClient.getStages(stagesRequest);
+        List<Stage> stageList = stagesResult.getItem();
+        for(Stage stage : stageList){
+            StageMetricEvent stageMetricEvent = new StageMetricEvent();
+            String stageName = stage.getStageName();
+            String deploymentId = stage.getDeploymentId();
+            Boolean cacheClusterEnabled = stage.getCacheClusterEnabled();
+            String cacheClusterSize = stage.getCacheClusterSize();
+            String cacheClusterStatus = stage.getCacheClusterStatus();
+            Date lastUpdatedDate = stage.getLastUpdatedDate();
+            Date createdDate = stage.getCreatedDate();
+
+            stageMetricEvent.setRestApiName(restApiName);
+            stageMetricEvent.setRegion(region);
+            stageMetricEvent.setStageName(stageName);
+            stageMetricEvent.setDeploymentId(deploymentId);
+            stageMetricEvent.setCacheClusterEnabled(cacheClusterEnabled);
+            stageMetricEvent.setCacheClusterSize(cacheClusterSize);
+            stageMetricEvent.setCacheClusterStatus(cacheClusterStatus);
+
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ");
+            String dateAsString = df.format(lastUpdatedDate);
+            String dateAsString2 = df.format(createdDate);
+
+            stageMetricEvent.setLastUpdatedDate(dateAsString);
+            stageMetricEvent.setCreatedDate(dateAsString2);
+
+            /*StringBuilder methodsBuilder = new StringBuilder();
+            Map<String, Method> resourceMethods = stage.getResourceMethods();
+            if(resourceMethods != null) {
+                for (Map.Entry<String, Method> entry : resourceMethods.entrySet()) {
+                    String resourceMethodName = entry.getKey();
+                    Method method = entry.getValue();
+                    methodsBuilder.append(resourceMethodName + " ");
+                }
+            }*/
+
+
+            stageMetricEvents.add(stageMetricEvent);
+        }
+        return stageMetricEvents;
     }
 
 
