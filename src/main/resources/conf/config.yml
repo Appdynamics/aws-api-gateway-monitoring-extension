@@ -46,7 +46,7 @@ metricsConfig:
     #       startTimeInMinsBeforeNow: 15
     #       endTimeInMinsBeforeNow: 0
     includeMetrics:
-        - name: "4XXError"
+        - apiName: "4XXError"
           alias: "4XXError"
           statType: "ave"
           delta: false
@@ -56,42 +56,42 @@ metricsConfig:
           metricsTimeRange:
               startTimeInMinsBeforeNow: 10
               endTimeInMinsBeforeNow: 0
-        - name: "5XXError"
+        - apiName: "5XXError"
           alias: "5XXError"
           statType: "ave"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-        - name: "CacheHitCount"
+        - apiName: "CacheHitCount"
           alias: "CacheHitCount"
           statType: "ave"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-        - name: "CacheMissCount"
+        - apiName: "CacheMissCount"
           alias: "CacheMissCount"
           statType: "ave"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-        - name: "Count"
+        - apiName: "Count"
           alias: "API count"
           statType: "sum"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-        - name: "IntegrationLatency"
+        - apiName: "IntegrationLatency"
           alias: "Integration Latency"
           statType: "ave"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-        - name: "Latency"
+        - apiName: "Latency"
           alias: "Latency"
           statType: "ave"
           delta: false

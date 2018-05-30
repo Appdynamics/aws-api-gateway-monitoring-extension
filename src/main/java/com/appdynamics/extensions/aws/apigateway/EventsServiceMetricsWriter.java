@@ -315,16 +315,16 @@ public class EventsServiceMetricsWriter {
         credentials.put("ControllerGlobalAccountName", "customer1_7a47c220-1e00-403b-a955-ac18296a1409");
         credentials.put("EventsAPIKey", "302c8c2b-5be8-4cb5-a5c4-30e0e57a49e1");
         eventsService.setCredentials(credentials);
+        eventsService.setTraditonalMetricsEnable(true);
+        eventsService.setApiMetricsEnable(true);
+        eventsService.setResourceMetricsEnable(true);
+        eventsService.setStageMetricsEnable(true);
 
+        apiGatewayConfiguration.setEventsService(eventsService);
         EventsServiceMetricsWriter eventsServiceMetricsWriter = new EventsServiceMetricsWriter(eventsService);
 
         ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsWriter);
         configurationMetricsProcessor.uploadConfigurationMetrics();
-
-        /*List<Metric> metricList = Lists.newArrayList();
-        Metric metric = new Metric("hits", "20.0", "Server1|hits");
-        metricList.add(metric);
-        eventsServiceMetricsWriter.uploadTraditionalMetrics(metricList);*/
     }
 
 

@@ -15,15 +15,13 @@
 
 package com.appdynamics.extensions.aws.apigateway.events;
 
-import java.util.Date;
-
 /**
  * Created by venkata.konala on 5/28/18.
  */
 public class APIMetricEvent {
 
     private String id;
-    private String name;
+    private String apiName;
     private String region;
     private String description;
     private String date;
@@ -36,12 +34,12 @@ public class APIMetricEvent {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getApiName() {
+        return apiName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setApiName(String apiName) {
+        this.apiName = apiName;
     }
 
     public String getRegion() {

@@ -92,7 +92,7 @@ public class ConfigurationMetricsProcessor {
 
 
             apiMetricEvent.setId(id);
-            apiMetricEvent.setName(name);
+            apiMetricEvent.setApiName(name);
             apiMetricEvent.setRegion(region);
             apiMetricEvent.setDescription(description);
             apiMetricEvent.setDate(dateAsString);

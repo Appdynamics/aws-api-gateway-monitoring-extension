@@ -32,7 +32,7 @@ In order to use the extension, you need to update the config.yml file that is pr
         metricPrefix: "Server|Component:100|Custom Metrics|AWS APIGateway|"
         ```
 
-2. Provide accessKey(required) and secretKey(required) of our account(s), also provide displayAccountName(any name that represents your account) and
+2. Provide accessKey(required) and secretKey(required) of our account(s), also provide displayAccountName(any apiName that represents your account) and
    regions(required). If you are running this extension inside an EC2 instance which has IAM profile configured then you don't have to configure these values,
    extension will use IAM profile to authenticate.
    ~~~
@@ -78,8 +78,8 @@ Please provide the following in order for us to assist you better.
 1. Stop the running machine agent.
 2. Delete all existing logs under <MachineAgent>/logs.
 3. Please enable debug logging by editing the file <MachineAgent>/conf/logging/log4j.xml. Change the level value of the following <logger> elements to debug.
-   <logger name="com.singularity">
-   <logger name="com.appdynamics">
+   <logger apiName="com.singularity">
+   <logger apiName="com.appdynamics">
 4. Start the machine agent and please let it run for 10 mins. Then zip and upload all the logs in the directory <MachineAgent>/logs/*.
 5. Attach the zipped <MachineAgent>/conf/* directory here.
 6. Attach the zipped <MachineAgent>/monitors/ExtensionFolderYouAreHavingIssuesWith directory here.

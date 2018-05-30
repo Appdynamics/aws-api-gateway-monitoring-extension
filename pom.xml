@@ -12,8 +12,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
-        <target.name>AWSAPIGatewayMonitor</target.name>
-        <target.dir>${project.build.directory}/${target.name}</target.dir>
+        <target.apiName>AWSAPIGatewayMonitor</target.apiName>
+        <target.dir>${project.build.directory}/${target.apiName}</target.dir>
     </properties>
 
     <dependencies>
@@ -142,7 +142,7 @@
                                     <fileset dir="${build.directory}" includes="${project.artifactId}.${project.packaging}" />
                                 </copy>
                                 <zip destfile="${target.dir}-${project.version}.zip">
-                                    <zipfileset dir="${target.dir}" filemode="755" prefix="${target.name}/" />
+                                    <zipfileset dir="${target.dir}" filemode="755" prefix="${target.apiName}/" />
                                 </zip>
                                 <delete dir="${target.dir}" />
                             </target>
