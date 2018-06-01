@@ -21,6 +21,10 @@ import com.appdynamics.extensions.aws.apigateway.processors.APIGatewayMetricsPro
 import com.appdynamics.extensions.aws.collectors.NamespaceMetricStatisticsCollector;
 import com.appdynamics.extensions.aws.metric.processors.MetricsProcessor;
 import org.apache.log4j.Logger;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 
 /**
@@ -29,6 +33,7 @@ import org.apache.log4j.Logger;
 public class APIGatewayMonitor extends SingleNamespaceCloudwatchMonitor<APIGatewayConfiguration>{
 
     private static final Logger logger = Logger.getLogger(APIGatewayMonitor.class);
+
 
     public APIGatewayMonitor(){
         super(APIGatewayConfiguration.class);
@@ -49,7 +54,7 @@ public class APIGatewayMonitor extends SingleNamespaceCloudwatchMonitor<APIGatew
     }
 
     private MetricsProcessor createMetricsProcessor(APIGatewayConfiguration apiGatewayConfiguration){
-        return new APIGatewayMetricsProcessor(apiGatewayConfiguration.getMetricsConfig().getIncludeMetrics(), apiGatewayConfiguration.getApiNames());
+        return new APIGatewayMetricsProcessor(apiGatewayConfiguration);
     }
 
     @Override

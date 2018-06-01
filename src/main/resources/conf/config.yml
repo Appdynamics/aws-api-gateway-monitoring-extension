@@ -110,3 +110,15 @@ regionEndPoints:
   eu-west-1: monitoring.eu-west-1.amazonaws.com
   sa-east-1: monitoring.sa-east-1.amazonaws.com
 
+#eventsService:
+#    enableTraditionalMetrics: false
+#    enableApiMetrics: false
+#    enableResourceMetrics: false
+#    enableStageMetrics: false
+#    credentials:
+#        controllerEventsServiceHost: ""
+#        controllerEventsServicePort: 9080
+#        enableSSL: false
+#        controllerGlobalAccountName: ""
+#        eventsAPIKey: ""
+

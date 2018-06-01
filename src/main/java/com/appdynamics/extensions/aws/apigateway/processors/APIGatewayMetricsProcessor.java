@@ -18,6 +18,9 @@ package com.appdynamics.extensions.aws.apigateway.processors;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.model.DimensionFilter;
 import com.appdynamics.extensions.aws.apigateway.ApiNamesPredicate;
+import com.appdynamics.extensions.aws.apigateway.EventsServiceMetricsWriter;
+import com.appdynamics.extensions.aws.apigateway.configuration.APIGatewayConfiguration;
+import com.appdynamics.extensions.aws.apigateway.configuration.EventsService;
 import com.appdynamics.extensions.aws.config.IncludeMetric;
 import com.appdynamics.extensions.aws.dto.AWSMetric;
 import com.appdynamics.extensions.aws.metric.*;
@@ -32,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
 
+
 /**
  * Created by venkata.konala on 4/23/18.
  */
@@ -42,10 +46,14 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     private static final String APINAME = "ApiName";
     private List<IncludeMetric> includeMetrics;
     private List<String> apiNamesList;
+    private APIGatewayConfiguration apiGatewayConfiguration;
+    private Map<String, ?> eventsService;
 
-    public APIGatewayMetricsProcessor(List<IncludeMetric> includeMetrics, List<String> apiNamesList){
-        this.includeMetrics = includeMetrics;
-        this.apiNamesList = apiNamesList;
+    public APIGatewayMetricsProcessor(APIGatewayConfiguration apiGatewayConfiguration){
+        this.apiGatewayConfiguration = apiGatewayConfiguration;
+        this.includeMetrics = apiGatewayConfiguration.getMetricsConfig().getIncludeMetrics();
+        this.apiNamesList = apiGatewayConfiguration.getApiNames();
+        this.eventsService = apiGatewayConfiguration.getEventsService();
     }
 
     @Override
@@ -116,7 +124,22 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
                 }
             }
         }
+        uploadToEventsServiceIfEnabled(stats);
         return stats;
+    }
+
+    private void uploadToEventsServiceIfEnabled(List<Metric> metricList){
+        if(eventsService != null){
+            EventsServiceMetricsWriter eventsServiceMetricsWriter = new EventsServiceMetricsWriter(eventsService);
+            ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsWriter);
+            if(eventsService.get("enableTraditionalMetrics") != null && (Boolean) eventsService.get("enableTraditionalMetrics")) {
+                eventsServiceMetricsWriter.uploadTraditionalMetrics(metricList);
+            }
+            configurationMetricsProcessor.uploadConfigurationMetrics();
+        }
+        else{
+            logger.debug("EventsService metrics are not enabled!!!!");
+        }
     }
 
     private String createMetricPath(String accountName, String region, MetricStatistic metricStatistic){

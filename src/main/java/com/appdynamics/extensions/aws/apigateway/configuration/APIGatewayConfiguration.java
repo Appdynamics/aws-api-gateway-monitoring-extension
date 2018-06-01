@@ -15,25 +15,27 @@
 
 package com.appdynamics.extensions.aws.apigateway.configuration;
 
+import com.appdynamics.extensions.alerts.customevents.Event;
 import com.appdynamics.extensions.aws.config.Configuration;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by venkata.konala on 4/23/18.
  */
 public class APIGatewayConfiguration extends Configuration {
 
-    private Boolean enableAnalytics;
+    private Map<String, ?> eventsService;
     private List<String> apiNames;
 
 
-    public void setEnableAnalytics(Boolean enableAnalytics) {
-        this.enableAnalytics = enableAnalytics;
+    public void setEventsService(Map<String, ?> eventsService) {
+        this.eventsService = eventsService;
     }
 
-    public Boolean getEnableAnalytics() {
-        return enableAnalytics;
+    public Map<String, ?> getEventsService() {
+        return eventsService;
     }
 
     public void setApiNames(List<String> apiNames) {
