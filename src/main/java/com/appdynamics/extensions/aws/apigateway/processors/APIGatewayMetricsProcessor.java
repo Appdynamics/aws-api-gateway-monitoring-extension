@@ -47,7 +47,7 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     private List<IncludeMetric> includeMetrics;
     private List<String> apiNamesList;
     private APIGatewayConfiguration apiGatewayConfiguration;
-    private EventsService eventsService;
+    private Map<String, ?> eventsService;
 
     public APIGatewayMetricsProcessor(APIGatewayConfiguration apiGatewayConfiguration){
         this.apiGatewayConfiguration = apiGatewayConfiguration;
@@ -129,10 +129,10 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     }
 
     private void uploadToEventsServiceIfEnabled(List<Metric> metricList){
-        if(eventsService != null && eventsService.isEnable()){
+        if(eventsService != null){
             EventsServiceMetricsWriter eventsServiceMetricsWriter = new EventsServiceMetricsWriter(eventsService);
             ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsWriter);
-            if(eventsService.isTraditonalMetricsEnable()) {
+            if(eventsService.get("enableTraditionalMetrics") != null && (Boolean) eventsService.get("enableTraditionalMetrics")) {
                 eventsServiceMetricsWriter.uploadTraditionalMetrics(metricList);
             }
             configurationMetricsProcessor.uploadConfigurationMetrics();

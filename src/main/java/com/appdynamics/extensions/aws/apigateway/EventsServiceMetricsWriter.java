@@ -52,10 +52,10 @@ public class EventsServiceMetricsWriter {
 
     private static final Logger logger = Logger.getLogger(EventsServiceMetricsWriter.class);
 
-    private EventsService eventsService;
+    private Map<String, ?> eventsService;
 
     private String host;
-    private  Integer port;
+    private Integer port;
     private Boolean useSsl;
     private String accountName;
     private String apiKey;
@@ -63,31 +63,31 @@ public class EventsServiceMetricsWriter {
     private CloseableHttpClient httpClient;
     private HttpHost httpHost;
 
-    public EventsServiceMetricsWriter(EventsService eventsService){
+    public EventsServiceMetricsWriter(Map<String, ?> eventsService){
         this.eventsService = eventsService;
         initialize();
     }
 
     private void initialize(){
-        Map<String, ?> credentials = eventsService.getCredentials();
-        host = credentials.get("ControllerEventsServiceHost") == null ? null : credentials.get("ControllerEventsServiceHost").toString();
-        AssertUtils.assertNotNull(host, "The ControllerEventsServiceHost field is null or empty");
-        port = credentials.get("ControllerEventsServicePort") == null ? null : (Integer)credentials.get("ControllerEventsServicePort");
-        AssertUtils.assertNotNull(port, "The ControllerEventsServicePort field is null or empty");
-        useSsl = credentials.get("SSLEnabled") == null ? null : (Boolean)credentials.get("SSLEnabled") ;
-        AssertUtils.assertNotNull(useSsl, "The SSLEnabled field is null or empty");
-        accountName = credentials.get("ControllerGlobalAccountName") == null ? null : credentials.get("ControllerGlobalAccountName").toString();
-        AssertUtils.assertNotNull(accountName, "The ControllerGlobalAccountName field is null or empty");
-        apiKey = credentials.get("EventsAPIKey") == null ? null : credentials.get("EventsAPIKey").toString();
-        AssertUtils.assertNotNull(apiKey, "The EventsAPIKey field is null or empty");
+        Map<String, ?> credentials = (Map<String, ?>)eventsService.get("credentials");
+        host = credentials.get("controllerEventsServiceHost") == null ? null : (String)credentials.get("controllerEventsServiceHost");
+        AssertUtils.assertNotNull(host, "The controllerEventsServiceHost field is null or empty");
+        port = credentials.get("controllerEventsServicePort") == null ? null : (Integer)credentials.get("controllerEventsServicePort");
+        AssertUtils.assertNotNull(port, "The controllerEventsServicePort field is null or empty");
+        useSsl = credentials.get("enableSSL") == null ? null : (Boolean)credentials.get("enableSSL") ;
+        AssertUtils.assertNotNull(useSsl, "The enableSSL field is null or empty");
+        accountName = credentials.get("controllerGlobalAccountName") == null ? null : (String)credentials.get("controllerGlobalAccountName");
+        AssertUtils.assertNotNull(accountName, "The controllerGlobalAccountName field is null or empty");
+        apiKey = credentials.get("eventsAPIKey") == null ? null : (String)credentials.get("eventsAPIKey");
+        AssertUtils.assertNotNull(apiKey, "The eventsAPIKey field is null or empty");
 
         httpClient = HttpClients.createDefault();
         httpHost = new HttpHost(host, port, useSsl ? "https" : "http");
     }
 
     public void uploadTraditionalMetrics(final List<Metric> metricList){
-        if(eventsSchemaExists("traditionalMetrics")){
-            deleteEventsSchema("traditionalMetrics");
+        if(eventsSchemaExists("AWSAPIGatewayMonitor_traditionalMetrics")){
+            deleteEventsSchema("AWSAPIGatewayMonitor_traditionalMetrics");
         }
         TraditionalMetricSchema traditionalMetricSchema = new TraditionalMetricSchema();
         traditionalMetricSchema.setMetricName("string");
@@ -95,7 +95,7 @@ public class EventsServiceMetricsWriter {
         traditionalMetricSchema.setMetricValue("string");
         Schema schema = new Schema();
         schema.setSchema(traditionalMetricSchema);
-        createEventsSchema("traditionalMetrics", schema);
+        createEventsSchema("AWSAPIGatewayMonitor_traditionalMetrics", schema);
 
         List<TraditonalMetricEvent> traditonalMetricEventList = Lists.newArrayList();
         for(Metric metric : metricList){
@@ -105,13 +105,13 @@ public class EventsServiceMetricsWriter {
             traditonalMetricEvent.setMetricValue(metric.getMetricValue());
             traditonalMetricEventList.add(traditonalMetricEvent);
         }
-        publishEvents("traditionalMetrics", traditonalMetricEventList);
+        publishEvents("AWSAPIGatewayMonitor_traditionalMetrics", traditonalMetricEventList);
 
     }
 
     public void uploadAPIMetrics(final List<APIMetricEvent> apiMetricEventList){
-        if(eventsSchemaExists("APIMetrics")){
-            deleteEventsSchema("APIMetrics");
+        if(eventsSchemaExists("AWSAPIGatewayMonitor_APIMetrics")){
+            deleteEventsSchema("AWSAPIGatewayMonitor_APIMetrics");
         }
         Schema schema = new Schema();
         APIMetricSchema apiMetricSchema = new APIMetricSchema();
@@ -121,14 +121,14 @@ public class EventsServiceMetricsWriter {
         apiMetricSchema.setDescription("string");
         apiMetricSchema.setDate("date");
         schema.setSchema(apiMetricSchema);
-        createEventsSchema("APIMetrics", schema);
-        publishEvents("APIMetrics", apiMetricEventList);
+        createEventsSchema("AWSAPIGatewayMonitor_APIMetrics", schema);
+        publishEvents("AWSAPIGatewayMonitor_APIMetrics", apiMetricEventList);
 
     }
 
     public void uploadResourceMetrics(final List<ResourceMetricEvent> resourceMetricEventList){
-        if(eventsSchemaExists("ResourceMetrics")){
-            deleteEventsSchema("ResourceMetrics");
+        if(eventsSchemaExists("AWSAPIGatewayMonitor_ResourceMetrics")){
+            deleteEventsSchema("AWSAPIGatewayMonitor_ResourceMetrics");
         }
         Schema schema = new Schema();
         ResourceMetricSchema resourceMetricSchema = new ResourceMetricSchema();
@@ -141,14 +141,14 @@ public class EventsServiceMetricsWriter {
         resourceMetricSchema.setPathPart("string");
         resourceMetricSchema.setMethods("string");
         schema.setSchema(resourceMetricSchema);
-        createEventsSchema("ResourceMetrics", schema);
-        publishEvents("ResourceMetrics", resourceMetricEventList);
+        createEventsSchema("AWSAPIGatewayMonitor_ResourceMetrics", schema);
+        publishEvents("AWSAPIGatewayMonitor_ResourceMetrics", resourceMetricEventList);
 
     }
 
     public void uploadStageMetrics(final List<StageMetricEvent> stageMetricEventList){
-        if(eventsSchemaExists("StageMetrics")){
-            deleteEventsSchema("StageMetrics");
+        if(eventsSchemaExists("AWSAPIGatewayMonitor_StageMetrics")){
+            deleteEventsSchema("AWSAPIGatewayMonitor_StageMetrics");
         }
         Schema schema = new Schema();
         StageMetricSchema stageMetricSchema = new StageMetricSchema();
@@ -162,9 +162,9 @@ public class EventsServiceMetricsWriter {
         stageMetricSchema.setLastUpdatedDate("date");
         stageMetricSchema.setCreatedDate("date");
         schema.setSchema(stageMetricSchema);
-        createEventsSchema("StageMetrics", schema);
+        createEventsSchema("AWSAPIGatewayMonitor_StageMetrics", schema);
 
-        publishEvents("StageMetrics", stageMetricEventList);
+        publishEvents("AWSAPIGatewayMonitor_StageMetrics", stageMetricEventList);
 
     }
 
@@ -182,7 +182,7 @@ public class EventsServiceMetricsWriter {
             }
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.error(String.format("Error while checking if the %s schema exists",schema) + e);
         }
         finally {
             if(response != null){
@@ -208,11 +208,11 @@ public class EventsServiceMetricsWriter {
         try {
             response = httpClient.execute(httpDelete);
             if (response != null && (statusLine = response.getStatusLine()) != null && statusLine.getStatusCode() == 200 ){
-                logger.debug("Successfully deleted {} schema" + schema);
+                logger.debug(String.format("Successfully deleted %s schema", schema) );
             }
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.error(String.format("Error while deleting the eventSchema %s",schema) + e);
         }
         finally {
             if(response != null){
@@ -241,12 +241,12 @@ public class EventsServiceMetricsWriter {
             StatusLine statusLine;
             response = httpClient.execute(httpPost);
             if (response != null && (statusLine = response.getStatusLine()) != null && statusLine.getStatusCode() == 201 ){
-                logger.debug("{} created !!" +  schema);
+                logger.debug(String.format("%s created !!", schema));
             }
 
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.error(String.format("Error while creating the eventSchema for %s",schema) + e);
         }
         finally {
             if(response != null){
@@ -276,12 +276,12 @@ public class EventsServiceMetricsWriter {
             StatusLine statusLine;
             response = httpClient.execute(httpPost);
             if (response != null && (statusLine = response.getStatusLine()) != null && statusLine.getStatusCode() == 200 ){
-                logger.debug("Events published for {} !!" +  schema);
+                logger.debug(String.format("Events published for %s !!", schema));
             }
 
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.error(String.format("Error while publishing the events for %s",schema) + e);
         }
         finally {
             if(response != null){
@@ -296,38 +296,4 @@ public class EventsServiceMetricsWriter {
         }
 
     }
-
-    public static void main(String args[]){
-
-        APIGatewayConfiguration apiGatewayConfiguration = new APIGatewayConfiguration();
-        Account account = new Account();
-        account.setAwsAccessKey("");
-        account.setAwsSecretKey("");
-        account.setRegions(Sets.newHashSet("us-west-2"));
-        apiGatewayConfiguration.setAccounts(Lists.newArrayList(account));
-
-        EventsService eventsService = new EventsService();
-        eventsService.setEnable(true);
-        Map<String, Object> credentials = Maps.newHashMap();
-        credentials.put("ControllerEventsServiceHost", "localhost");
-        credentials.put("ControllerEventsServicePort", 9080);
-        credentials.put("SSLEnabled", false);
-        credentials.put("ControllerGlobalAccountName", "customer1_7a47c220-1e00-403b-a955-ac18296a1409");
-        credentials.put("EventsAPIKey", "302c8c2b-5be8-4cb5-a5c4-30e0e57a49e1");
-        eventsService.setCredentials(credentials);
-        eventsService.setTraditonalMetricsEnable(true);
-        eventsService.setApiMetricsEnable(true);
-        eventsService.setResourceMetricsEnable(true);
-        eventsService.setStageMetricsEnable(true);
-
-        apiGatewayConfiguration.setEventsService(eventsService);
-        EventsServiceMetricsWriter eventsServiceMetricsWriter = new EventsServiceMetricsWriter(eventsService);
-
-        ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsWriter);
-        configurationMetricsProcessor.uploadConfigurationMetrics();
-    }
-
-
-
-
 }

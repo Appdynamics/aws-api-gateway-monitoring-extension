@@ -22,19 +22,42 @@ import java.util.Map;
  */
 public class EventsService {
 
-    private boolean enable;
+    private boolean enableTraditionalMetrics;
+    private boolean enableApiMetrics;
+    private boolean enableResourceMetrics;
+    private boolean enableStageMetrics;
     private Map<String, ?> credentials;
-    private boolean traditonalMetricsEnable;
-    private boolean apiMetricsEnable;
-    private boolean resourceMetricsEnable;
-    private boolean stageMetricsEnable;
 
-    public boolean isEnable() {
-        return enable;
+    public boolean isEnableTraditonalMetrics() {
+        return enableTraditionalMetrics;
     }
 
-    public void setEnable(boolean enable) {
-        this.enable = enable;
+    public void setEnableTraditonalMetrics(boolean enableTraditionalMetrics) {
+        this.enableTraditionalMetrics = enableTraditionalMetrics;
+    }
+
+    public boolean isEnableApiMetrics() {
+        return enableApiMetrics;
+    }
+
+    public void setEnableApiMetrics(boolean enableApiMetrics) {
+        this.enableApiMetrics = enableApiMetrics;
+    }
+
+    public boolean isEnableResourceMetrics() {
+        return enableResourceMetrics;
+    }
+
+    public void setEnableResourceMetrics(boolean enableResourceMetrics) {
+        this.enableResourceMetrics = enableResourceMetrics;
+    }
+
+    public boolean isEnableStageMetrics() {
+        return enableStageMetrics;
+    }
+
+    public void setEnableStageMetrics(boolean enableStageMetrics) {
+        this.enableStageMetrics = enableStageMetrics;
     }
 
     public Map<String, ?> getCredentials() {
@@ -43,37 +66,5 @@ public class EventsService {
 
     public void setCredentials(Map<String, ?> credentials) {
         this.credentials = credentials;
-    }
-
-    public boolean isTraditonalMetricsEnable() {
-        return traditonalMetricsEnable;
-    }
-
-    public void setTraditonalMetricsEnable(boolean traditonalMetricsEnable) {
-        this.traditonalMetricsEnable = traditonalMetricsEnable;
-    }
-
-    public boolean isApiMetricsEnable() {
-        return apiMetricsEnable;
-    }
-
-    public void setApiMetricsEnable(boolean apiMetricsEnable) {
-        this.apiMetricsEnable = apiMetricsEnable;
-    }
-
-    public boolean isResourceMetricsEnable() {
-        return resourceMetricsEnable;
-    }
-
-    public void setResourceMetricsEnable(boolean resourceMetricsEnable) {
-        this.resourceMetricsEnable = resourceMetricsEnable;
-    }
-
-    public boolean isStageMetricsEnable() {
-        return stageMetricsEnable;
-    }
-
-    public void setStageMetricsEnable(boolean stageMetricsEnable) {
-        this.stageMetricsEnable = stageMetricsEnable;
     }
 }

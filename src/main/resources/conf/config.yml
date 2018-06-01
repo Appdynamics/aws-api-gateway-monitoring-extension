@@ -46,7 +46,7 @@ metricsConfig:
     #       startTimeInMinsBeforeNow: 15
     #       endTimeInMinsBeforeNow: 0
     includeMetrics:
-        - apiName: "4XXError"
+        - name: "4XXError"
           alias: "4XXError"
           statType: "ave"
           delta: false
@@ -56,42 +56,42 @@ metricsConfig:
           metricsTimeRange:
               startTimeInMinsBeforeNow: 10
               endTimeInMinsBeforeNow: 0
-        - apiName: "5XXError"
+        - name: "5XXError"
           alias: "5XXError"
           statType: "ave"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-        - apiName: "CacheHitCount"
+        - name: "CacheHitCount"
           alias: "CacheHitCount"
           statType: "ave"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-        - apiName: "CacheMissCount"
+        - name: "CacheMissCount"
           alias: "CacheMissCount"
           statType: "ave"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-        - apiName: "Count"
+        - name: "Count"
           alias: "API count"
           statType: "sum"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-        - apiName: "IntegrationLatency"
+        - name: "IntegrationLatency"
           alias: "Integration Latency"
           statType: "ave"
           delta: false
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-        - apiName: "Latency"
+        - name: "Latency"
           alias: "Latency"
           statType: "ave"
           delta: false
@@ -111,16 +111,14 @@ regionEndPoints:
   sa-east-1: monitoring.sa-east-1.amazonaws.com
 
 #eventsService:
-#    enable: false
-
+#    enableTraditionalMetrics: false
+#    enableApiMetrics: false
+#    enableResourceMetrics: false
+#    enableStageMetrics: false
 #    credentials:
-#        ControllerEventsServiceHost:
-#        ControllerEventsServicePort:
-#        SSLEnabled:
-#        ControllerGlobalAccountName:
-#        EventsAPIKey:
+#        controllerEventsServiceHost: ""
+#        controllerEventsServicePort: 9080
+#        enableSSL: false
+#        controllerGlobalAccountName: ""
+#        eventsAPIKey: ""
 
-#    traditionalMetricsEnable:
-#    apiMetricsEnable:
-#    resourceMetricsEnable:
-#    stageMetricsEnable:

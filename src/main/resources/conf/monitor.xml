@@ -14,15 +14,15 @@
   -->
 
 <monitor>
-    <apiName>AWSAPIGatewayMonitor</apiName>
+    <name>AWSAPIGatewayMonitor</name>
     <type>managed</type>
     <enabled>true</enabled>
     <description>Monitors AWS API Gateway server</description>
     <monitor-configuration>
     </monitor-configuration>
     <monitor-run-task>
-        <apiName>APIGatewayMonitor Run Task</apiName>
-        <display-apiName>APIGatewayMonitor Run Task</display-apiName>
+        <name>APIGatewayMonitor Run Task</name>
+        <display-name>APIGatewayMonitor Run Task</display-name>
         <description>APIGatewayMonitor Run Task</description>
         <type>java</type>
         <execution-style>periodic</execution-style>
@@ -30,7 +30,7 @@
         <execution-timeout-in-secs>60</execution-timeout-in-secs>
         <task-arguments>
             <!-- config file-->
-            <argument apiName="config-file" is-required="true" default-value="monitors/AWSAPIGatewayMonitor/config.yml" />
+            <argument name="config-file" is-required="true" default-value="monitors/AWSAPIGatewayMonitor/config.yml" />
         </task-arguments>
         <java-task>
             <classpath>aws-api-gateway-monitoring-extension.jar</classpath>

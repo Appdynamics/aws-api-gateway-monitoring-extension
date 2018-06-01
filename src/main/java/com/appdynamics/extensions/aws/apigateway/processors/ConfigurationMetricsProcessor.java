@@ -43,7 +43,7 @@ import java.util.Map;
 public class ConfigurationMetricsProcessor {
 
     private APIGatewayConfiguration apiGatewayConfiguration;
-    private EventsService eventsService;
+    private Map<String, ?> eventsService;
     private EventsServiceMetricsWriter eventsServiceMetricsWriter;
 
     public ConfigurationMetricsProcessor(APIGatewayConfiguration apiGatewayConfiguration, EventsServiceMetricsWriter eventsServiceMetricsWriter){
@@ -99,22 +99,22 @@ public class ConfigurationMetricsProcessor {
 
             apiMetricEventList.add(apiMetricEvent);
 
-            if (eventsService.isResourceMetricsEnable()) {
+            if (eventsService.get("enableResourceMetrics") != null && (Boolean)eventsService.get("enableResourceMetrics")) {
                 List<ResourceMetricEvent> restApiResourceMetricEventList = getResourcesData(amazonApiGatewayClient, region, id, name);
                 resourceMetricEventList.addAll(restApiResourceMetricEventList);
             }
-            if (eventsService.isStageMetricsEnable()) {
+            if (eventsService.get("enableStageMetrics") != null && (Boolean)eventsService.get("enableStageMetrics")) {
                 List<StageMetricEvent> restApiStageMetricEventList = getStagesData(amazonApiGatewayClient, region, id, name);
                 stageMetricEventList.addAll(restApiStageMetricEventList);
             }
         }
-        if(eventsService.isResourceMetricsEnable()) {
+        if(eventsService.get("enableResourceMetrics") != null && (Boolean)eventsService.get("enableResourceMetrics")) {
             eventsServiceMetricsWriter.uploadResourceMetrics(resourceMetricEventList);
         }
-        if(eventsService.isStageMetricsEnable()) {
+        if(eventsService.get("enableStageMetrics") != null && (Boolean)eventsService.get("enableStageMetrics")) {
             eventsServiceMetricsWriter.uploadStageMetrics(stageMetricEventList);
         }
-        if(eventsService.isApiMetricsEnable()) {
+        if(eventsService.get("enableApiMetrics") != null && (Boolean)eventsService.get("enableApiMetrics")) {
             eventsServiceMetricsWriter.uploadAPIMetrics(apiMetricEventList);
         }
         return apiMetricEventList;
