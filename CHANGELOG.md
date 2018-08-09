@@ -1,4 +1,4 @@
-# AppDynamics API Gateway Monitoring Extension CHANGELOG
+# API Gateway Monitoring Extension
 
 ## 2.0.0 - May 27, 2018
 1. Added capability to send standard cloudwatch metrics to AppDynamics eventsService.
