@@ -20,11 +20,11 @@ import com.appdynamics.extensions.aws.apigateway.configuration.APIGatewayConfigu
 import com.appdynamics.extensions.aws.apigateway.processors.APIGatewayMetricsProcessor;
 import com.appdynamics.extensions.aws.collectors.NamespaceMetricStatisticsCollector;
 import com.appdynamics.extensions.aws.metric.processors.MetricsProcessor;
+import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -73,7 +73,7 @@ public class APIGatewayMonitor extends SingleNamespaceCloudwatchMonitor<APIGatew
     }
 
     @Override
-    protected int getTaskCount() {
-        return 1;
+    protected List<Map<String, ?>> getServers() {
+        return Lists.newArrayList();
     }
 }
