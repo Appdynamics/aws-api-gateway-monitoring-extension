@@ -1,5 +1,8 @@
 # API Gateway Monitoring Extension
 
+### Version 2.0.3 - March 2, 2020
+Updated aws-cloudwatch-exts-commons from 2.2.0 to 2.2.1
+
 ### Version 2.0.2 - Feb 5, 2020
 Updated aws-cloudwatch-exts-commons from 2.0.0 to 2.2.0
 
