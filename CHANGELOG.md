@@ -15,8 +15,3 @@ Updated aws-cloudwatch-exts-commons from 2.0.0 to 2.2.0
 
 ## 1.0.0 - May 24, 2018
 1. Initial version.
-
-
-
-
-
