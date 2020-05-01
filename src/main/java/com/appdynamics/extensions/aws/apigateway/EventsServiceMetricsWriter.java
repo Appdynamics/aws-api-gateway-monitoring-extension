@@ -24,6 +24,7 @@ import com.appdynamics.extensions.aws.apigateway.events.TraditonalMetricEvent;
 import com.appdynamics.extensions.aws.apigateway.processors.ConfigurationMetricsProcessor;
 import com.appdynamics.extensions.aws.apigateway.schemas.*;
 import com.appdynamics.extensions.aws.config.Account;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.util.AssertUtils;
 import com.google.common.collect.Lists;
@@ -39,7 +40,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -50,7 +51,7 @@ import java.util.Map;
  */
 public class EventsServiceMetricsWriter {
 
-    private static final Logger logger = Logger.getLogger(EventsServiceMetricsWriter.class);
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(EventsServiceMetricsWriter.class);
 
     private Map<String, ?> eventsService;
 
@@ -63,9 +64,15 @@ public class EventsServiceMetricsWriter {
     private CloseableHttpClient httpClient;
     private HttpHost httpHost;
 
-    public EventsServiceMetricsWriter(Map<String, ?> eventsService){
-        this.eventsService = eventsService;
-        initialize();
+    private EventsServiceMetricsWriter(){
+    }
+
+    private static final EventsServiceMetricsWriter eventsServiceMetricWriter = new EventsServiceMetricsWriter();
+
+    public static EventsServiceMetricsWriter getEventsServiceMetricsWriter(Map<String, ?> eventsService) {
+        eventsServiceMetricWriter.eventsService = eventsService;
+        eventsServiceMetricWriter.initialize();
+        return eventsServiceMetricWriter;
     }
 
     private void initialize(){
@@ -80,8 +87,9 @@ public class EventsServiceMetricsWriter {
         AssertUtils.assertNotNull(accountName, "The controllerGlobalAccountName field is null or empty");
         apiKey = credentials.get("eventsAPIKey") == null ? null : (String)credentials.get("eventsAPIKey");
         AssertUtils.assertNotNull(apiKey, "The eventsAPIKey field is null or empty");
-
-        httpClient = HttpClients.createDefault();
+        if(httpClient == null) {
+            httpClient = HttpClients.createDefault();
+        }
         httpHost = new HttpHost(host, port, useSsl ? "https" : "http");
     }
 
