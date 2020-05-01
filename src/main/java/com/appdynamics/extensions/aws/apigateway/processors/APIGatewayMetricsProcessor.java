@@ -16,6 +16,7 @@
 package com.appdynamics.extensions.aws.apigateway.processors;
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
+import com.amazonaws.services.cloudwatch.model.Dimension;
 import com.amazonaws.services.cloudwatch.model.DimensionFilter;
 import com.appdynamics.extensions.aws.apigateway.ApiNamesPredicate;
 import com.appdynamics.extensions.aws.apigateway.EventsServiceMetricsWriter;
@@ -26,10 +27,12 @@ import com.appdynamics.extensions.aws.dto.AWSMetric;
 import com.appdynamics.extensions.aws.metric.*;
 import com.appdynamics.extensions.aws.metric.processors.MetricsProcessor;
 import com.appdynamics.extensions.aws.metric.processors.MetricsProcessorHelper;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +44,7 @@ import java.util.concurrent.atomic.LongAdder;
  */
 public class APIGatewayMetricsProcessor implements MetricsProcessor {
 
-    private static final Logger logger = Logger.getLogger(APIGatewayMetricsProcessor.class);
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(APIGatewayMetricsProcessor.class);
     private static final String NAMESPACE = "AWS/ApiGateway";
     private static final String APINAME = "ApiName";
     private List<IncludeMetric> includeMetrics;
@@ -130,7 +133,7 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
 
     private void uploadToEventsServiceIfEnabled(List<Metric> metricList){
         if(eventsService != null){
-            EventsServiceMetricsWriter eventsServiceMetricsWriter = new EventsServiceMetricsWriter(eventsService);
+            EventsServiceMetricsWriter eventsServiceMetricsWriter = EventsServiceMetricsWriter.getEventsServiceMetricsWriter(eventsService);
             ConfigurationMetricsProcessor configurationMetricsProcessor = new ConfigurationMetricsProcessor(apiGatewayConfiguration, eventsServiceMetricsWriter);
             if(eventsService.get("enableTraditionalMetrics") != null && (Boolean) eventsService.get("enableTraditionalMetrics")) {
                 eventsServiceMetricsWriter.uploadTraditionalMetrics(metricList);
@@ -146,14 +149,29 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
         AWSMetric awsMetric = metricStatistic.getMetric();
         IncludeMetric includeMetric = awsMetric.getIncludeMetric();
         com.amazonaws.services.cloudwatch.model.Metric metric = awsMetric.getMetric();
-        String apiName = metric.getDimensions().get(0).getValue();
+        String apiName = null;
+        String stageName = null;
+
+        for(Dimension dimension : metric.getDimensions()) {
+            if(dimension.getName().equalsIgnoreCase("ApiName")) {
+                apiName = dimension.getValue();
+            }
+            if(dimension.getName().equalsIgnoreCase("Stage")) {
+                stageName = dimension.getValue();
+            }
+        }
+        //apiName will never be null
         StringBuilder stringBuilder = new StringBuilder(accountName)
                 .append("|")
                 .append(region)
                 .append("|")
                 .append(apiName)
-                .append("|")
-                .append(includeMetric.getName());
+                .append("|");
+        if(stageName != null) {
+            stringBuilder.append(stageName)
+                    .append("|");
+        }
+        stringBuilder.append(includeMetric.getName());
         return stringBuilder.toString();
 
     }
@@ -162,6 +180,4 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     public String getNamespace() {
         return NAMESPACE;
     }
-
-
 }
