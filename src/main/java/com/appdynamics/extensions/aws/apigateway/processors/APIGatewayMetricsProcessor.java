@@ -180,6 +180,4 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     public String getNamespace() {
         return NAMESPACE;
     }
-
-
 }

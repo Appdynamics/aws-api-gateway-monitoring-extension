@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-api-gateway</artifactId>
-            <version>1.10.29</version>
+            <version>1.11.642</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -177,7 +177,7 @@
                 <enabled>true</enabled>
             </releases>
             <snapshots>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </snapshots>
             <url>https://github.com/Appdynamics/maven-repo/raw/master/releases</url>
         </repository>
