@@ -20,9 +20,9 @@ import com.appdynamics.extensions.aws.apigateway.configuration.APIGatewayConfigu
 import com.appdynamics.extensions.aws.apigateway.processors.APIGatewayMetricsProcessor;
 import com.appdynamics.extensions.aws.collectors.NamespaceMetricStatisticsCollector;
 import com.appdynamics.extensions.aws.metric.processors.MetricsProcessor;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.google.common.collect.Lists;
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class APIGatewayMonitor extends SingleNamespaceCloudwatchMonitor<APIGatewayConfiguration>{
 
-    private static final Logger logger = Logger.getLogger(APIGatewayMonitor.class);
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(APIGatewayMonitor.class);
 
 
     public APIGatewayMonitor(){

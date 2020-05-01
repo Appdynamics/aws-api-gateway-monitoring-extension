@@ -10,7 +10,7 @@ Captures statistics for APIs in the API Gateway from Amazon CloudWatch and displ
 2. In order to use this extension, you do need a [Standalone JAVA Machine Agent](https://docs.appdynamics.com/display/PRO44/Standalone+Machine+Agents) or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).  For more details on downloading these products, please  visit [here](https://download.appdynamics.com/).
 3. The extension needs to be able to connect to AWS Cloudwatch in order to collect and send metrics. To do this, you will have to either establish a remote connection in between the extension and the product, or have an agent on the same machine running the product in order for the extension to collect and send the metrics.
 
-<p><strong>Agent Compatibility:</strong></p>
+## Agent Compatibility
 <p><strong>Note: This extension is compatible with Machine Agent version 4.5.13 or later.</strong></p>
 <ol>
 <li>
@@ -103,9 +103,9 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 ## Version
    |          Name            |  Version   |
    |--------------------------|------------|
-   |Extension Version         |2.0.3       |
+   |Extension Version         |2.0.4       |
    |Controller Compatibility  |4.4 or Later|
-   |Last Update               |March 2, 2020 |
+   |Last Update               |May 1, 2020 |
 
 
 
