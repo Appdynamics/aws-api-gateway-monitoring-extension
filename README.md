@@ -59,6 +59,12 @@ In order to use the extension, you need to update the config.yml file that is pr
        regions: ["eu-central-1","eu-west-1"]
    ~~~
 
+3. Provide the list of Api names that needs to be monitored. This list accepts regular expressions.
+   
+   ~~~
+   apiNames: ["api1", "api2"]
+   ~~~   
+
 ## Metrics
 
    1. 4XXError            -        The number of client-side errors captured in a specified period.
