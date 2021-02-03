@@ -1,5 +1,8 @@
 # API Gateway Monitoring Extension
 
+### Version 2.0.5 - Feb 2, 2021
+1. Updated aws-cloudwatch-exts-xommons from 2.2.3 to 2.2.4
+
 ### Version 2.0.4 - May 1, 2020
 1. Updated aws-cloudwatch-exts-xommons from 2.2.1 to 2.2.3
 
