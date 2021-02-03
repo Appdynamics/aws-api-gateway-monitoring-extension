@@ -3,7 +3,6 @@
 #Use the following metricPrefix if SIM is not enabled.
 metricPrefix: "Server|Component:<COMPONENT_ID>|Custom Metrics|AWS APIGateway|"
 
-enableHealthChecks: false
 #Allowed values are Basic and Detailed. Refer https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-new.html for more information
 # Basic will fire CloudWatch API calls every 5 minutes
 # Detailed will fire CloudWatch API calls every 1 minutes
