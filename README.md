@@ -109,10 +109,10 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 ## Version
    |          Name            |  Version   |
    |--------------------------|------------|
-   |Extension Version         |2.0.5       |
+   |Extension Version         |2.0.6       |
    |Controller Compatibility  |4.5 or Later|
    |Agent Compatibility  |4.5.13 or Later|
-   |Last Update               |Feb 2, 2021 |
+   |Last Update               |May 28, 2021 |
 
 
 
