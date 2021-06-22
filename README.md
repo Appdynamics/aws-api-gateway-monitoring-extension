@@ -76,7 +76,9 @@ In order to use the extension, you need to update the config.yml file that is pr
    7. Latency             -        The time between when API Gateway receives a request from a client and when it returns a response to the client. The latency includes the integration latency and other API Gateway overhead.
 
    Apart from the above metric, we also have a metric called "API calls", that gives out the number of cloudwatch API calls from the extension.
-
+   
+## Credentials Encryption
+Please visit [this page](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-Password-Encryption-with-Extensions/ta-p/29397) to get detailed instructions on password encryption. The steps in this document will guide you through the whole process.
 
 ## Extensions Workbench
 
