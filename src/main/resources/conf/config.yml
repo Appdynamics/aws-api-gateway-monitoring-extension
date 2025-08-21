@@ -1,7 +1,7 @@
 #Use the following metricPrefix if SIM is enabled.
 #metricPrefix: "Custom Metrics|AWS APIGateway|"
 #Use the following metricPrefix if SIM is not enabled.
-metricPrefix: "Server|Component:<COMPONENT_ID>|Custom Metrics|AWS APIGateway|"
+metricPrefix: "Server|Component:dev-node123|Custom Metrics|AWS APIGateway|"
 
 #Allowed values are Basic and Detailed. Refer https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-new.html for more information
 # Basic will fire CloudWatch API calls every 5 minutes
@@ -21,15 +21,15 @@ concurrencyConfig:
 accounts:
   - awsAccessKey: ""
     awsSecretKey: ""
-    displayAccountName: "AppD"
-    regions: ["us-west-2"]
+    displayAccountName: "Test Gateway"
+    regions: ["ap-south-1"]
 
 apiNames: []
 
 metricsConfig:
     # Global time range configuration, applicable to all the metrics configured below.
     metricsTimeRange:
-        startTimeInMinsBeforeNow: 10
+        startTimeInMinsBeforeNow: 60
         endTimeInMinsBeforeNow: 0
     # Rate limit ( per second ) for GetMetricStatistics, default value is 400. https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html
     getMetricStatisticsRateLimit: 400
@@ -53,9 +53,6 @@ metricsConfig:
           multiplier: 1
           timeRollUpType: "AVERAGE"
           clusterRollUpType: "INDIVIDUAL"
-          metricsTimeRange:
-              startTimeInMinsBeforeNow: 10
-              endTimeInMinsBeforeNow: 0
         - name: "5XXError"
           alias: "5XXError"
           statType: "ave"
@@ -103,6 +100,7 @@ regionEndPoints:
   ap-northeast-1: monitoring.ap-northeast-1.amazonaws.com
   ap-southeast-1: monitoring.ap-southeast-1.amazonaws.com
   ap-southeast-2: monitoring.ap-southeast-2.amazonaws.com
+  ap-south-1: monitoring.ap-south-1.amazonaws.com
   eu-central-1: monitoring.eu-central-1.amazonaws.com
   us-east-1: monitoring.us-east-1.amazonaws.com
   us-west-1: monitoring.us-west-1.amazonaws.com

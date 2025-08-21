@@ -15,13 +15,13 @@
 
 package com.appdynamics.extensions.aws.apigateway.processors;
 
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
-import com.amazonaws.services.cloudwatch.model.Dimension;
-import com.amazonaws.services.cloudwatch.model.DimensionFilter;
+import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
+import software.amazon.awssdk.services.cloudwatch.model.Dimension;
+import software.amazon.awssdk.services.cloudwatch.model.DimensionFilter;
 import com.appdynamics.extensions.aws.apigateway.ApiNamesPredicate;
 import com.appdynamics.extensions.aws.apigateway.EventsServiceMetricsWriter;
 import com.appdynamics.extensions.aws.apigateway.configuration.APIGatewayConfiguration;
-import com.appdynamics.extensions.aws.apigateway.configuration.EventsService;
+
 import com.appdynamics.extensions.aws.config.IncludeMetric;
 import com.appdynamics.extensions.aws.dto.AWSMetric;
 import com.appdynamics.extensions.aws.metric.*;
@@ -31,6 +31,9 @@ import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+
+
 import org.slf4j.Logger;
 
 
@@ -47,6 +50,7 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     private static final Logger logger = ExtensionsLoggerFactory.getLogger(APIGatewayMetricsProcessor.class);
     private static final String NAMESPACE = "AWS/ApiGateway";
     private static final String APINAME = "ApiName";
+    private static final String APIID = "ApiId";
     private List<IncludeMetric> includeMetrics;
     private List<String> apiNamesList;
     private APIGatewayConfiguration apiGatewayConfiguration;
@@ -60,7 +64,7 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     }
 
     @Override
-    public List<AWSMetric> getMetrics(AmazonCloudWatch awsCloudWatch, String accountName, LongAdder awsRequestsCounter) {
+    public List<AWSMetric> getMetrics(CloudWatchClient cloudWatchClient, String accountName, LongAdder awsRequestsCounter) {
         /*The dimension being used here for filtering is "ApiName".
         * Another available dimension is "ApiName" and "Stage".
         * The "ApiName" dimension filter will retrieve metrics with just the
@@ -77,18 +81,28 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
         * */
         ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
 
-        return MetricsProcessorHelper.getFilteredMetrics(awsCloudWatch, awsRequestsCounter, NAMESPACE, includeMetrics, dimensionFilters, apiNamesPredicate);
+        return MetricsProcessorHelper.getFilteredMetrics(cloudWatchClient, awsRequestsCounter, NAMESPACE, includeMetrics, dimensionFilters, apiNamesPredicate);
     }
 
     private List<DimensionFilter> getDimensionFilters(){
         List<DimensionFilter> dimensionFilters = Lists.newArrayList();
 
-        DimensionFilter apiNameDimensionFilter = new DimensionFilter();
-        apiNameDimensionFilter.withName(APINAME);
+        DimensionFilter apiNameDimensionFilter = DimensionFilter.builder()
+                .name(APIID)
+                .build();
+        DimensionFilter resourceNameDimensionFilter = DimensionFilter.builder()
+                .name("Resource")
+                .build();
+        DimensionFilter stageNameDimensionFilter = DimensionFilter.builder()
+                .name("Stage")
+                .build();
+
         dimensionFilters.add(apiNameDimensionFilter);
+        dimensionFilters.add(stageNameDimensionFilter);
+        dimensionFilters.add(resourceNameDimensionFilter);
 
         /*DimensionFilter stageDimensionFilter = new DimensionFilter();
-        stageDimensionFilter.withName("Stage");
+        stageDimensionFilter.setName("Stage");
         dimensionFilters.add(stageDimensionFilter);*/
 
         return dimensionFilters;
@@ -148,16 +162,20 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     private String createMetricPath(String accountName, String region, MetricStatistic metricStatistic){
         AWSMetric awsMetric = metricStatistic.getMetric();
         IncludeMetric includeMetric = awsMetric.getIncludeMetric();
-        com.amazonaws.services.cloudwatch.model.Metric metric = awsMetric.getMetric();
+        software.amazon.awssdk.services.cloudwatch.model.Metric metric = awsMetric.getMetric();
         String apiName = null;
         String stageName = null;
+        String routeName = null;
 
-        for(Dimension dimension : metric.getDimensions()) {
-            if(dimension.getName().equalsIgnoreCase("ApiName")) {
-                apiName = dimension.getValue();
+        for(Dimension dimension : metric.dimensions()) {
+            if(dimension.name().equalsIgnoreCase("ApiId")) {
+                apiName = dimension.value();
             }
-            if(dimension.getName().equalsIgnoreCase("Stage")) {
-                stageName = dimension.getValue();
+            if(dimension.name().equalsIgnoreCase("Stage")) {
+                stageName = dimension.value();
+            }
+            if(dimension.name().equalsIgnoreCase("Resource")) {
+                routeName = dimension.value();
             }
         }
         //apiName will never be null
@@ -171,7 +189,12 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
             stringBuilder.append(stageName)
                     .append("|");
         }
+        if(routeName != null) {
+            stringBuilder.append(routeName)
+                    .append("|");
+        }
         stringBuilder.append(includeMetric.getName());
+        logger.info(stringBuilder.toString());
         return stringBuilder.toString();
 
     }

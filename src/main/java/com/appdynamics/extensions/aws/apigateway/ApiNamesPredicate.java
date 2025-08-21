@@ -16,7 +16,7 @@
 package com.appdynamics.extensions.aws.apigateway;
 
 
-import com.amazonaws.services.cloudwatch.model.Metric;
+import software.amazon.awssdk.services.cloudwatch.model.Metric;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
@@ -58,7 +58,7 @@ public class ApiNamesPredicate implements Predicate<Metric> {
             return true;
         }
         else{
-            String apiName = metric.getDimensions().get(0).getValue();
+            String apiName = metric.dimensions().get(0).value();
             return patternPredicate.apply(apiName);
         }
     }
