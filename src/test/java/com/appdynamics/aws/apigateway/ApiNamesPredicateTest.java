@@ -42,8 +42,8 @@ public class ApiNamesPredicateTest {
     public void matchedApiNameMetricShouldReturnTrue(){
         metric = mock(Metric.class);
         dimension = mock(Dimension.class);
-        List<String> apiNamesList = Lists.newArrayList("sampleName");
-        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
+        List<String> apiIdList = Lists.newArrayList("sampleName");
+        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiIdList);
         when(metric.dimensions()).thenReturn(Lists.newArrayList(dimension));
         when(dimension.value()).thenReturn("sampleName");
         Assert.assertTrue(apiNamesPredicate.apply(metric));
@@ -54,8 +54,8 @@ public class ApiNamesPredicateTest {
     public void unMatchedApiNameMetricShouldReturnFalse(){
         metric = mock(Metric.class);
         dimension = mock(Dimension.class);
-        List<String> apiNamesList = Lists.newArrayList("sampleName1", "sampleName2");
-        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
+        List<String> apiIdList = Lists.newArrayList("sampleName1", "sampleName2");
+        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiIdList);
         when(metric.dimensions()).thenReturn(Lists.newArrayList(dimension));
         when(dimension.value()).thenReturn("sampleName");
         Assert.assertFalse(apiNamesPredicate.apply(metric));
@@ -65,8 +65,8 @@ public class ApiNamesPredicateTest {
     @Test
     public void emptyPredicateShouldReturnTrue(){
         metric = mock(Metric.class);
-        List<String> apiNamesList = Lists.newArrayList();
-        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
+        List<String> apiIdList = Lists.newArrayList();
+        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiIdList);
         Assert.assertTrue(apiNamesPredicate.apply(metric));
 
     }
@@ -74,8 +74,8 @@ public class ApiNamesPredicateTest {
     @Test
     public void nullPredicateShouldReturnTrue(){
         metric = mock(Metric.class);
-        List<String> apiNamesList = null;
-        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
+        List<String> apiIdList = null;
+        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiIdList);
         Assert.assertTrue(apiNamesPredicate.apply(metric));
 
     }
@@ -83,8 +83,8 @@ public class ApiNamesPredicateTest {
     @Test
     public void emptyApiNamesInListShouldReturnTrue(){
         metric = mock(Metric.class);
-        List<String> apiNamesList = Lists.newArrayList("", "");
-        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
+        List<String> apiIdList = Lists.newArrayList("", "");
+        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiIdList);
         Assert.assertTrue(apiNamesPredicate.apply(metric));
 
     }
@@ -93,8 +93,8 @@ public class ApiNamesPredicateTest {
     public void emptyApiNamesAndNonEmtyApiNamesInListShouldReturnTrueIfMatched(){
         metric = mock(Metric.class);
         dimension = mock(Dimension.class);
-        List<String> apiNamesList = Lists.newArrayList("sampleName", "");
-        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
+        List<String> apiIdList = Lists.newArrayList("sampleName", "");
+        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiIdList);
         when(metric.dimensions()).thenReturn(Lists.newArrayList(dimension));
         when(dimension.value()).thenReturn("sampleName");
         Assert.assertTrue(apiNamesPredicate.apply(metric));
@@ -105,8 +105,8 @@ public class ApiNamesPredicateTest {
     public void emptyApiNamesAndNonEmtyApiNamesInListShouldReturnFalseIfNotMatched(){
         metric = mock(Metric.class);
         dimension = mock(Dimension.class);
-        List<String> apiNamesList = Lists.newArrayList("sampleName$", "");
-        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
+        List<String> apiIdList = Lists.newArrayList("sampleName$", "");
+        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiIdList);
         when(metric.dimensions()).thenReturn(Lists.newArrayList(dimension));
         when(dimension.value()).thenReturn("sampleName1");
         Assert.assertFalse(apiNamesPredicate.apply(metric));

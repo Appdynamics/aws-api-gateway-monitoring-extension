@@ -24,7 +24,7 @@ accounts:
     displayAccountName: "Test Gateway"
     regions: ["ap-south-1"]
 
-apiNames: []
+apiId: []
 
 metricsConfig:
     # Global time range configuration, applicable to all the metrics configured below.
@@ -36,6 +36,10 @@ metricsConfig:
     # The max number of retry attempts for failed retryable requests
     # (ex: 5xx error responses from a service) or throttling errors
     maxErrorRetrySize: 0
+    # Default period for all metrics (in seconds). Must be a multiple of 60.
+    # Valid values: 60, 300, 3600, etc.
+    # Individual metrics can override this value using the 'period' field in the specific includeMetrics section
+    defaultPeriod: 300
     # By default, all metrics retrieved from cloudwatch are 'Average' values.
     # This option allows you to override the metric type.
     # Allowed statTypes are: ave, max, min, sum, samplecount

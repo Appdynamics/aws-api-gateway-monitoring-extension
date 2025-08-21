@@ -52,14 +52,14 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
     private static final String APINAME = "ApiName";
     private static final String APIID = "ApiId";
     private List<IncludeMetric> includeMetrics;
-    private List<String> apiNamesList;
+    private List<String> apiIdList;
     private APIGatewayConfiguration apiGatewayConfiguration;
     private Map<String, ?> eventsService;
 
     public APIGatewayMetricsProcessor(APIGatewayConfiguration apiGatewayConfiguration){
         this.apiGatewayConfiguration = apiGatewayConfiguration;
         this.includeMetrics = apiGatewayConfiguration.getMetricsConfig().getIncludeMetrics();
-        this.apiNamesList = apiGatewayConfiguration.getApiNames();
+        this.apiIdList = apiGatewayConfiguration.getApiId();
         this.eventsService = apiGatewayConfiguration.getEventsService();
     }
 
@@ -79,7 +79,7 @@ public class APIGatewayMetricsProcessor implements MetricsProcessor {
         * Since the dimension used for filtering is "ApiName", we can filter
         * further with the ApiName values.
         * */
-        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiNamesList);
+        ApiNamesPredicate apiNamesPredicate = new ApiNamesPredicate(apiIdList);
 
         return MetricsProcessorHelper.getFilteredMetrics(cloudWatchClient, awsRequestsCounter, NAMESPACE, includeMetrics, dimensionFilters, apiNamesPredicate);
     }

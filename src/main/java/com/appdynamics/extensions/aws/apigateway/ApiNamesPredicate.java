@@ -28,18 +28,18 @@ import java.util.List;
  */
 public class ApiNamesPredicate implements Predicate<Metric> {
 
-    private List<String> apiNamesList;
+    private List<String> apiIdList;
     private Predicate<CharSequence> patternPredicate;
 
-    public ApiNamesPredicate(List<String> apiNamesList){
-        this.apiNamesList = apiNamesList;
+    public ApiNamesPredicate(List<String> apiIdList){
+        this.apiIdList = apiIdList;
         buildPattern();
     }
 
     private void buildPattern(){
-        if(apiNamesList != null && !apiNamesList.isEmpty()){
+        if(apiIdList != null && !apiIdList.isEmpty()){
 
-            for(String apiPattern : apiNamesList){
+            for(String apiPattern : apiIdList){
                 if(!Strings.isNullOrEmpty(apiPattern)) {
                     Predicate<CharSequence> apiPatternPredicate = Predicates.containsPattern(apiPattern);
                     if (patternPredicate == null) {
