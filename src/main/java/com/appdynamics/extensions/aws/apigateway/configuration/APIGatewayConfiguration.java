@@ -27,7 +27,7 @@ import java.util.Map;
 public class APIGatewayConfiguration extends Configuration {
 
     private Map<String, ?> eventsService;
-    private List<String> apiNames;
+    private List<String> apiId;
 
 
     public void setEventsService(Map<String, ?> eventsService) {
@@ -38,11 +38,11 @@ public class APIGatewayConfiguration extends Configuration {
         return eventsService;
     }
 
-    public void setApiNames(List<String> apiNames) {
-        this.apiNames = apiNames;
+    public void setApiId(List<String> apiId) {
+        this.apiId = apiId;
     }
 
-    public List<String> getApiNames() {
-        return apiNames;
+    public List<String> getApiId() {
+        return apiId;
     }
 }

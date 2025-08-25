@@ -16,7 +16,7 @@
 package com.appdynamics.extensions.aws.apigateway;
 
 
-import com.amazonaws.services.cloudwatch.model.Metric;
+import software.amazon.awssdk.services.cloudwatch.model.Metric;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
@@ -28,18 +28,18 @@ import java.util.List;
  */
 public class ApiNamesPredicate implements Predicate<Metric> {
 
-    private List<String> apiNamesList;
+    private List<String> apiIdList;
     private Predicate<CharSequence> patternPredicate;
 
-    public ApiNamesPredicate(List<String> apiNamesList){
-        this.apiNamesList = apiNamesList;
+    public ApiNamesPredicate(List<String> apiIdList){
+        this.apiIdList = apiIdList;
         buildPattern();
     }
 
     private void buildPattern(){
-        if(apiNamesList != null && !apiNamesList.isEmpty()){
+        if(apiIdList != null && !apiIdList.isEmpty()){
 
-            for(String apiPattern : apiNamesList){
+            for(String apiPattern : apiIdList){
                 if(!Strings.isNullOrEmpty(apiPattern)) {
                     Predicate<CharSequence> apiPatternPredicate = Predicates.containsPattern(apiPattern);
                     if (patternPredicate == null) {
@@ -58,7 +58,7 @@ public class ApiNamesPredicate implements Predicate<Metric> {
             return true;
         }
         else{
-            String apiName = metric.getDimensions().get(0).getValue();
+            String apiName = metric.dimensions().get(0).value();
             return patternPredicate.apply(apiName);
         }
     }

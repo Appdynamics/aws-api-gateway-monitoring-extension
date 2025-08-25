@@ -52,11 +52,35 @@ More details around metric prefix can be found [here](https://community.appdynam
        regions: ["eu-central-1","eu-west-1"]
    ~~~
 
-3. Provide the list of Api names that needs to be monitored. This list accepts regular expressions.
+3. Provide the list of Api Ids that needs to be monitored. This list accepts regular expressions. (Previously api names were expected but the field has been deprecated)
    
    ~~~
-   apiNames: ["api1", "api2"]
+   apiId: ["api1", "api2"]
    ~~~   
+
+4. Configure the `metricsConfig` section to control how metrics are collected from CloudWatch:
+
+   **metricsTimeRange**: Controls the time window for metric collection
+   - `startTimeInMinsBeforeNow`: How many minutes back from current time to start collecting metrics (default: 60)
+   - `endTimeInMinsBeforeNow`: How many minutes back from current time to end collecting metrics (default: 0, meaning current time)
+   
+   **getMetricStatisticsRateLimit**: Rate limit per second for CloudWatch GetMetricStatistics API calls (default: 400). 
+   This helps avoid hitting AWS API throttling limits. See [AWS CloudWatch limits](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html) for more details.
+   
+   **maxErrorRetrySize**: Maximum number of retry attempts for failed requests or throttling errors (default: 0, meaning no retries).
+   
+   **defaultPeriod**: Default time period in seconds for all metrics. Must be a multiple of 60 (default: 300). 
+   Valid values include 60, 300, 3600, etc. Individual metrics can override this using the 'period' field in their specific configuration.
+
+   ~~~
+   metricsConfig:
+       metricsTimeRange:
+           startTimeInMinsBeforeNow: 60
+           endTimeInMinsBeforeNow: 0
+       getMetricStatisticsRateLimit: 400
+       maxErrorRetrySize: 0
+       defaultPeriod: 300
+   ~~~
 
 ## Metrics
 
