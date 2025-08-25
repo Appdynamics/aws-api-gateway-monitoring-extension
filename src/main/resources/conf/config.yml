@@ -21,15 +21,15 @@ concurrencyConfig:
 accounts:
   - awsAccessKey: ""
     awsSecretKey: ""
-    displayAccountName: "Test Gateway"
-    regions: ["ap-south-1"]
+    displayAccountName: "AppD"
+    regions: ["us-west-2"]
 
 apiId: []
 
 metricsConfig:
     # Global time range configuration, applicable to all the metrics configured below.
     metricsTimeRange:
-        startTimeInMinsBeforeNow: 60
+        startTimeInMinsBeforeNow: 10
         endTimeInMinsBeforeNow: 0
     # Rate limit ( per second ) for GetMetricStatistics, default value is 400. https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html
     getMetricStatisticsRateLimit: 400
