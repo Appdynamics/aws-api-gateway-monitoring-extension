@@ -1,4 +1,8 @@
 # API Gateway Monitoring Extension
+### Version 2.0.7 - August 26, 2025
+1. Updated aws-cloudwatch-exts-commons from 2.2.5 to 2.2.8
+2. Changed the dimension filters to use ApiId, Resource and Stage
+3. Added ApiId, Stage and Resource to the metric path
 
 ### Version 2.0.6 - May 28, 2021
 1. Updated aws-cloudwatch-exts-commons from 2.2.4 to 2.2.5
